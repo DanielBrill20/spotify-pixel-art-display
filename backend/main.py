@@ -10,8 +10,8 @@ import requests
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-TARGET_RESOLUTION = 64 # The physical LED matrix resolution
-ART_RESOLUTION = 64 # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
+TARGET_RESOLUTION = 64  # The physical LED matrix resolution
+ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ def get_image_url(album: Any) -> CoverURL:
     Returns:
         CoverURL: An CoverURL object for the album's album cover.
     """
-    images_arr = album['images'] # Images are sorted in decreasing size order
+    images_arr = album['images']  # Images are sorted in decreasing size order
     for image in reversed(images_arr):
         height = image['height']
         if height == ART_RESOLUTION:
@@ -89,7 +89,7 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
         image = image.resize((TARGET_RESOLUTION, TARGET_RESOLUTION), resample=Image.Resampling.NEAREST)
     if image.mode != 'RGB':
         image = image.convert('RGB')
-    return image.tobytes() # Much faster than image.load() and iterating over pixel data
+    return image.tobytes()  # Much faster than image.load() and iterating over pixel data
 
 def send_album_cover(art_bytes: bytes) -> None:
     # TODO: Send ESP image bytes to display
@@ -125,7 +125,7 @@ def main():
                 if current_album_id is not None:
                     current_album_id = None
                     send_screensaver_intent()
-                    snooze(iter_start)
+                snooze(iter_start)
                 continue
             
             # For a song/track, Spotify's response is item > album > id/images
@@ -147,7 +147,7 @@ def main():
             send_album_cover(art_bytes)
             snooze(iter_start)
         except Exception as e:
-            logger.error(e)
+            logger.exception(e)
             time.sleep(3) # Emergency back off
 
 if __name__ == '__main__':
