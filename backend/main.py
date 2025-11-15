@@ -1,10 +1,11 @@
 from io import BytesIO
 import logging
 import os
+import sys
 import time
-from typing import Any
+from typing import Any, Dict
 
-from dotenv import load_dotenv
+from dotenv import find_dotenv, load_dotenv
 from PIL import Image
 import requests
 import spotipy
@@ -12,6 +13,7 @@ from spotipy.oauth2 import SpotifyOAuth
 
 TARGET_RESOLUTION = 64  # The physical LED matrix resolution
 ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
+REQUIRED_ENVS = ('CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI')
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -35,6 +37,33 @@ class CoverURL:
     @property
     def oversized(self) -> bool:
         return self._oversized
+    
+def load_and_validate_env() -> Dict[str, str]:
+    """
+    Loads the .env file and ensures the user has all required environment variables.
+
+    Returns:
+        Dict[str, str]: A dictionary of environment variables and their values.
+
+    Raises:
+        FileNotFoundError: If .env is not found.
+        EnvironmentError: If an environment variable is missing.
+    """
+    env_path = find_dotenv()
+    if not env_path:
+        raise FileNotFoundError('.env file not found.')
+    load_dotenv(env_path)
+    envs = {}
+    missing = []
+    for key in REQUIRED_ENVS:
+        val = os.getenv(key)
+        if not val:
+            missing.append(key)
+        else:
+            envs[key] = val.strip()
+    if missing:
+        raise EnvironmentError(f'Missing required environment vars: {', '.join(missing)}')
+    return envs
 
 def auth_spotify() -> Any:
     """
@@ -44,9 +73,10 @@ def auth_spotify() -> Any:
     Returns:
         Spotify: A Spotify API client from spotipy.
     """
-    return spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('CLIENT_ID'),
-                                                   client_secret=os.getenv('CLIENT_SECRET'),
-                                                   redirect_uri=os.getenv('REDIRECT_URI'),
+    creds = load_and_validate_env()
+    return spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=creds['CLIENT_ID'],
+                                                   client_secret=creds['CLIENT_SECRET'],
+                                                   redirect_uri=creds['REDIRECT_URI'],
                                                    scope='user-read-currently-playing'))
 
 def get_image_url(album: Any) -> CoverURL:
@@ -110,9 +140,11 @@ def snooze(iter_start: float) -> None:
         time.sleep(0.5 - elapsed)
 
 def main():
-    load_dotenv()
-
-    spotify_client = auth_spotify()
+    try:
+        spotify_client = auth_spotify()
+    except Exception as e:
+        logger.critical(f'Startup failed: {e}')
+        sys.exit(1)
     current_album_id = None
 
     while True:
@@ -120,7 +152,7 @@ def main():
             iter_start = time.perf_counter()
             track_response = spotify_client.currently_playing(additional_types='episode')
 
-            if not track_response or not track_response['item']:
+            if not track_response or not track_response.get('item'):
                 if current_album_id is not None:
                     current_album_id = None
                     send_screensaver_intent()
