@@ -51,13 +51,13 @@ def auth_spotify() -> Any:
 
 def get_image_url(album: Any) -> CoverURL:
     """
-    Returns an CoverURL object of an album's smallest usable album cover.
+    Returns a CoverURL object of an album's smallest usable album cover.
 
     Parameters:
         album (Any): The album portion of Spotify's response to the currently playing endpoint.
 
     Returns:
-        CoverURL: An CoverURL object for the album's album cover.
+        CoverURL: A CoverURL object for the album's album cover.
     """
     images_arr = album['images']  # Images are sorted in decreasing size order
     for image in reversed(images_arr):
@@ -66,10 +66,9 @@ def get_image_url(album: Any) -> CoverURL:
             return CoverURL(url=image['url'], oversized=False)
         elif height >= ART_RESOLUTION:
             return CoverURL(url=image['url'], oversized=True)
-    else:
-        # All heights were None (unknown), so take first and resize
-        # Or we're using a massive matrix panel lmao
-        return CoverURL(url=images_arr[0]['url'], oversized=True)
+    # All heights were None (unknown), so take first and resize
+    # Or we're using a massive matrix panel lmao
+    return CoverURL(url=images_arr[0]['url'], oversized=True)
 
 def generate_byte_arr(cover_url: CoverURL) -> bytes:
     """
@@ -130,7 +129,7 @@ def main():
             
             # For a song/track, Spotify's response is item > album > id/images
             # For a podcast/episode, Spotify's response is item > id/images
-            # So, this allows us to retreive 'album' art for podcasts too!
+            # So, this allows us to retrieve 'album' art for podcasts too!
             # Optionally, I could look in item > show for a podcast (show is the equivalent of album),
             # but I am choosing to detect when the episode changes in case various episodes have different cover art
             album_obj = track_response['item']
