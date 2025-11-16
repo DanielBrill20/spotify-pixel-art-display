@@ -14,6 +14,7 @@ from spotipy.oauth2 import SpotifyOAuth
 TARGET_RESOLUTION = 64  # The physical LED matrix resolution
 ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
 REQUIRED_ENVS = ('CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI')
+POLLING_INTERVAL = 0.5
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -147,14 +148,14 @@ def send_screensaver_intent() -> None:
 
 def snooze(iter_start: float) -> None:
     """
-    Stops program execution 0.5 seconds after a given start time.
+    Stops program execution POLLING_INTERVAL seconds after a given start time.
 
     Parameters:
         iter_start (float): The program time in which we began counting.
     """
     elapsed = time.perf_counter() - iter_start
-    if elapsed < 0.5:
-        time.sleep(0.5 - elapsed)
+    if elapsed < POLLING_INTERVAL:
+        time.sleep(POLLING_INTERVAL - elapsed)
 
 def main():
     try:
