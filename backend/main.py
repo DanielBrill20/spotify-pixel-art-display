@@ -11,6 +11,14 @@ import requests
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+"""
+Failure points - Solutions:
+1. .env errors (missing file or env vars) - stop program and fix
+2. Spotify authentication fails (hopefuly only authenticate once ever??) - stop program and fix?
+3. Fail to fetch image URL (could be bad URL, network down, etc.) - If can retry, do so. If not, spotify screensaver?
+4. Fail to fetch currently playing (too many requests, network time out, etc.) - If can retry, do so. If not, screensaver
+"""
+
 TARGET_RESOLUTION = 64  # The physical LED matrix resolution
 ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
 REQUIRED_ENVS = ('CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI')
@@ -100,6 +108,23 @@ def get_image_url(album: Any) -> CoverURL:
     # Or we're using a massive matrix panel lmao
     return CoverURL(url=images_arr[0]['url'], oversized=True)
 
+def get_imgage_src_bytes(url: str, max_retries: int = 5) -> bytes:
+    """
+    Fetches an image at a given URL.
+
+    Parameters:
+        url (str): The image URL.
+    
+    Returns:
+        bytes: The response content (the image bytes)
+
+    Raises:
+        HTTPError: If the request fails
+    """
+    response = requests.get(url, timeout=3)
+    response.raise_for_status()
+    return response.content
+
 def generate_byte_arr(cover_url: CoverURL) -> bytes:
     """
     Generates an appropriately sized byte array for an image at a given URL.
@@ -110,7 +135,7 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
     Returns:
         bytes: The RGB data of the new image, as a byte array.
     """
-    src_bytes = requests.get(cover_url.url).content
+    src_bytes = get_imgage_src_bytes(cover_url.url)
     image = Image.open(BytesIO(src_bytes))
     if cover_url.oversized:
         image = image.resize((ART_RESOLUTION, ART_RESOLUTION), resample=Image.Resampling.LANCZOS)
@@ -143,6 +168,7 @@ def main():
     try:
         spotify_client = auth_spotify()
     except Exception as e:
+        # Will catch SpotifyOauthError if OAuth fails, and failures with .env
         logger.critical(f'Startup failed: {e}')
         sys.exit(1)
     current_album_id = None
@@ -171,11 +197,11 @@ def main():
             if album_id == current_album_id:
                 snooze(iter_start)
                 continue
-            current_album_id = album_id
 
             cover_url = get_image_url(album)
             art_bytes = generate_byte_arr(cover_url)
             send_album_cover(art_bytes)
+            current_album_id = album_id  # Only update after matrix updated
             snooze(iter_start)
         except Exception as e:
             logger.exception(e)
