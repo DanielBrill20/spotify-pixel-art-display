@@ -109,10 +109,10 @@ def get_image_src_bytes(url: str) -> bytes:
         url (str): The image URL.
     
     Returns:
-        bytes: The response content (the image bytes)
+        bytes: The response content (the image bytes).
 
     Raises:
-        HTTPError: If the request fails
+        HTTPError: If the request fails.
     """
     response = requests.get(url, timeout=3)
     response.raise_for_status()
