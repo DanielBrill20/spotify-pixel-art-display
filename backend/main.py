@@ -11,14 +11,6 @@ import requests
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-"""
-Failure points - Solutions:
-1. .env errors (missing file or env vars) - stop program and fix
-2. Spotify authentication fails (hopefuly only authenticate once ever??) - stop program and fix?
-3. Fail to fetch image URL (could be bad URL, network down, etc.) - If can retry, do so. If not, spotify screensaver?
-4. Fail to fetch currently playing (too many requests, network time out, etc.) - If can retry, do so. If not, screensaver
-"""
-
 TARGET_RESOLUTION = 64  # The physical LED matrix resolution
 ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
 REQUIRED_ENVS = ('CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI')
@@ -108,7 +100,7 @@ def get_image_url(album: Any) -> CoverURL:
     # Or we're using a massive matrix panel lmao
     return CoverURL(url=images_arr[0]['url'], oversized=True)
 
-def get_imgage_src_bytes(url: str, max_retries: int = 5) -> bytes:
+def get_image_src_bytes(url: str) -> bytes:
     """
     Fetches an image at a given URL.
 
@@ -135,7 +127,7 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
     Returns:
         bytes: The RGB data of the new image, as a byte array.
     """
-    src_bytes = get_imgage_src_bytes(cover_url.url)
+    src_bytes = get_image_src_bytes(cover_url.url)
     image = Image.open(BytesIO(src_bytes))
     if cover_url.oversized:
         image = image.resize((ART_RESOLUTION, ART_RESOLUTION), resample=Image.Resampling.LANCZOS)
