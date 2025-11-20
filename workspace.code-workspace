@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "ESP32 Firmware", 
+      "path": "esp_firmware"
+    },
+    {
+      "name": "Spotify API Server",
+      "path": "spotify_api_server"
+    },
+    {
+      "name": "Root",
+      "path": "."
+    }
+  ]
+}
