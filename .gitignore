@@ -1,4 +1,9 @@
-.env
-.venv
-backend/.cache
+esp_firmware/build/
+esp_firmware/sdkconfig
+esp_firmware/sdkconfig.old
+esp_firmware/.vscode/
+spotify_api_server/.cache
+spotify_api_server/.env
+spotify_api_server/.venv
+spotify_api_server/.vscode/
 ProjectRoadmap.md
