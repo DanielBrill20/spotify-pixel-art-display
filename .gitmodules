@@ -1,0 +1,9 @@
+[submodule "esp_firmware/components/ESP32-HUB75-MatrixPanel-DMA"]
+	path = esp_firmware/components/ESP32-HUB75-MatrixPanel-DMA
+	url = https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA
+[submodule "esp_firmware/components/Adafruit-GFX-Library"]
+	path = esp_firmware/components/Adafruit-GFX-Library
+	url = https://github.com/adafruit/Adafruit-GFX-Library
+[submodule "esp_firmware/components/Adafruit_BusIO"]
+	path = esp_firmware/components/Adafruit_BusIO
+	url = https://github.com/adafruit/Adafruit_BusIO
