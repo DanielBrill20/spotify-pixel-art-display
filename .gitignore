@@ -1,4 +1,5 @@
 esp_firmware/build/
+esp_firmware/managed_components
 esp_firmware/sdkconfig
 esp_firmware/sdkconfig.old
 esp_firmware/.vscode/
