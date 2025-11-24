@@ -1,0 +1,25 @@
+menu "Project Configuration"
+    config WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the ESP to connect to.
+
+    config WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the ESP to connect to.
+
+    config PANEL_WIDTH
+        int "LED Panel Width"
+        default 64
+        help
+            The width, in pixels, of your HUB75 LED Matrix
+
+    config PANEL_HEIGHT
+        int "LED Panel Height"
+        default 64
+        help
+            The height, in pixels, of your HUB75 LED Matrix
+endmenu
