@@ -35,7 +35,7 @@ static esp_err_t image_handler(httpd_req_t* req)
         return ESP_FAIL;
     }
 
-    int received = 0;
+    uint16_t received = 0;
     int ret;
     while (received < IMAGE_SIZE) {
         ret = httpd_req_recv(req, (char*)(image_buf + received), (IMAGE_SIZE - received));
@@ -50,7 +50,7 @@ static esp_err_t image_handler(httpd_req_t* req)
         received += ret;
     }
 
-    ESP_LOGI(SERVER_TAG, "Received %d bytes of image data", received);
+    ESP_LOGI(SERVER_TAG, "Received %u bytes of image data", received);
     // TODO: Use buffer to activate panel
 
     httpd_resp_sendstr(req, "Successfully uploaded image");
