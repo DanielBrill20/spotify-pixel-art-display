@@ -126,6 +126,7 @@ static void initialize_mdns()
 {
     ESP_ERROR_CHECK(mdns_init());
     ESP_ERROR_CHECK(mdns_hostname_set(CONFIG_MDNS_HOSTNAME));
+    ESP_LOGI(WIFI_TAG, "mDNS hostname set as %s, can be resolved as %s.local", CONFIG_MDNS_HOSTNAME, CONFIG_MDNS_HOSTNAME);
 }
 
 void wifi_manager_init()
