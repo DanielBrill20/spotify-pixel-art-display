@@ -122,6 +122,12 @@ static void wait_for_connection()
     }
 }
 
+static void initialize_mdns()
+{
+    ESP_ERROR_CHECK(mdns_init());
+    ESP_ERROR_CHECK(mdns_hostname_set(CONFIG_MDNS_HOSTNAME));
+}
+
 void wifi_manager_init()
 {
     // Create the event group
@@ -137,4 +143,5 @@ void wifi_manager_init()
     configure_wifi();
     start_wifi();
     wait_for_connection();
+    initialize_mdns();
 }
