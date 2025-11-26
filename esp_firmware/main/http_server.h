@@ -10,6 +10,10 @@ extern "C" {
 #include "esp_log.h"
 #include "esp_http_server.h"
 
+#define IMAGE_SIZE (CONFIG_PANEL_WIDTH * CONFIG_PANEL_HEIGHT * 3)
+
+extern uint8_t image_buf[IMAGE_SIZE];
+
 /**
  * @brief   Starts a simple HTTP server, defines URIs, and registers handlers to handle them.
  */
