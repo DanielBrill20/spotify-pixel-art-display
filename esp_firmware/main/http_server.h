@@ -1,6 +1,10 @@
 #ifndef HTTP_SERVER_H
 #define HTTP_SERVER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "string.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -10,5 +14,9 @@
  * @brief   Starts a simple HTTP server, defines URIs, and registers handlers to handle them.
  */
 void http_server_init();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // HTTP_SERVER_H
