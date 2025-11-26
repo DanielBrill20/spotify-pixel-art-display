@@ -13,12 +13,4 @@
       "path": "."
     }
   ],
-  "settings": {
-    "files.associations": {
-      "string.h": "c",
-      "esp_err.h": "c",
-      "esp_compiler.h": "c",
-      "esp_http_server.h": "c"
-    }
-  }
 }

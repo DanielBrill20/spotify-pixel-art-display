@@ -9,7 +9,7 @@ menu "Project Configuration"
         string "WiFi Password"
         default ""
         help
-            WiFi password (WPA or WPA2) for the ESP to connect to.
+            WiFi password for the ESP to connect to.
 
     config MAX_CONNECTION_RETRIES
         int "Max WiFi Connection Retries"
