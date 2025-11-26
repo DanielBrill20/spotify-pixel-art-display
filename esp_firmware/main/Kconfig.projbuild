@@ -11,6 +11,12 @@ menu "Project Configuration"
         help
             WiFi password (WPA or WPA2) for the ESP to connect to.
 
+    config MDNS_HOSTNAME
+        string "mDNS Hostname"
+        default "LedMatrix"
+        help
+            The ESP's mDNS hostname for finding the device on the network.
+
     config PANEL_WIDTH
         int "LED Panel Width"
         default 64
