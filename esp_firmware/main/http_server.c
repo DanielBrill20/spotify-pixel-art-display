@@ -1,10 +1,8 @@
 #include "http_server.h"
 
-#define IMAGE_SIZE (CONFIG_PANEL_WIDTH * CONFIG_PANEL_HEIGHT * 3)
-
 static const char* SERVER_TAG = "http server";
 
-static uint8_t* image_buf;
+uint8_t image_buf[IMAGE_SIZE];
 
 // Declaring URI Handlers
 static esp_err_t image_handler(httpd_req_t*);
