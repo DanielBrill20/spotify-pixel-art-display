@@ -10,9 +10,8 @@ uint8_t image_buf[IMAGE_SIZE];
 static esp_err_t image_handler(httpd_req_t*);
 static esp_err_t screensaver_handler(httpd_req_t*);
 
-// Server and Config
-static httpd_handle_t server = NULL;
-static httpd_config_t server_config = HTTPD_DEFAULT_CONFIG();
+// Server
+static httpd_handle_t server;
 
 // URIs
 static httpd_uri_t image_uri = {
@@ -71,6 +70,7 @@ static esp_err_t screensaver_handler(httpd_req_t* req)
 // Helpers
 static void start_server()
 {
+    httpd_config_t server_config = HTTPD_DEFAULT_CONFIG();
     ESP_ERROR_CHECK(httpd_start(&server, &server_config));
     ESP_LOGI(SERVER_TAG, "HTTP server started");
 }
