@@ -1,4 +1,6 @@
 #include "http_server.h"
+#include "esp_log.h"
+#include "esp_http_server.h"
 
 static const char* SERVER_TAG = "http server";
 
@@ -59,9 +61,10 @@ static esp_err_t image_handler(httpd_req_t* req)
 
 static esp_err_t screensaver_handler(httpd_req_t* req)
 {
-    // TODO: Go to screensaver in panel
-    
     ESP_LOGI(SERVER_TAG, "Received screensaver intent");
+    // TODO: Go to screensaver in panel
+
+    httpd_resp_sendstr(req, "Received screensaver intent");
     return ESP_OK;
 }
 
@@ -79,8 +82,9 @@ static void register_uri_handlers()
     ESP_LOGI(SERVER_TAG, "URI handlers registered");
 }
 
-void http_server_init()
+esp_err_t http_server_init()
 {
     start_server();
     register_uri_handlers();
+    return ESP_OK;
 }

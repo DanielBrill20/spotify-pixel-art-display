@@ -1,6 +1,6 @@
 idf_component_register(SRCS "http_server.c" "wifi_manager.c" "main.cpp"
                     INCLUDE_DIRS "."
-                    REQUIRES esp_wifi esp_http_server nvs_flash esp_netif espressif__arduino-esp32)
+                    REQUIRES esp_wifi esp_http_server nvs_flash esp_netif espressif__arduino-esp32 espressif__mdns)
 
 idf_build_set_property(EXCLUDE_COMPONENTS esp_lcd)
 

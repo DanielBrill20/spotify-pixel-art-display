@@ -1,15 +1,22 @@
 menu "Project Configuration"
     config WIFI_SSID
         string "WiFi SSID"
-        default "myssid"
+        default ""
         help
             SSID (network name) for the ESP to connect to.
 
     config WIFI_PASSWORD
         string "WiFi Password"
-        default "mypassword"
+        default ""
         help
             WiFi password (WPA or WPA2) for the ESP to connect to.
+
+    config MAX_CONNECTION_RETRIES
+        int "Max WiFi Connection Retries"
+        default 5
+        range 1 50
+        help
+            The maximum number retries to connect to the AP in the event of loss of connection.
 
     config MDNS_HOSTNAME
         string "mDNS Hostname"

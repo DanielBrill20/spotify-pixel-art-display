@@ -1,4 +1,13 @@
 #include "wifi_manager.h"
+#include <stdint.h>
+#include "sdkconfig.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "esp_wifi.h"
+#include "nvs_flash.h"
+#include "esp_netif.h"
+#include "mdns.h"
 
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAILED_BIT BIT1
@@ -8,7 +17,7 @@ static const char* WIFI_TAG = "wifi station";
 // FreeRTOS event group
 static EventGroupHandle_t wifi_event_group;
 
-static uint8_t connection_attempts = 0;
+static uint8_t connection_retries = 0;
 
 static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
@@ -16,11 +25,15 @@ static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_
         ESP_ERROR_CHECK(esp_wifi_connect());
         ESP_LOGI(WIFI_TAG, "Connection to AP started successfully");
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        if (connection_attempts < 5) {
-            ESP_LOGW(WIFI_TAG, "Failed to connect to the AP, retrying...");
+        wifi_event_sta_disconnected_t* event = (wifi_event_sta_disconnected_t*) event_data;
+        ESP_LOGW(WIFI_TAG, "Disconnected from AP with reason %d", event->reason);
+        xEventGroupClearBits(wifi_event_group, WIFI_CONNECTED_BIT);
+        if (connection_retries < CONFIG_MAX_CONNECTION_RETRIES) {
+            ESP_LOGW(WIFI_TAG, "Retrying connection (%u/%d)...", connection_retries+1, CONFIG_MAX_CONNECTION_RETRIES);
             ESP_ERROR_CHECK(esp_wifi_connect());
-            connection_attempts++;
+            connection_retries++;
         } else {
+            ESP_LOGE(WIFI_TAG, "Max reconnect attempts reached");
             xEventGroupSetBits(wifi_event_group, WIFI_FAILED_BIT);
         }
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
@@ -28,7 +41,7 @@ static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         ESP_LOGI(WIFI_TAG, "Successfully retrieved IP address: " IPSTR, IP2STR(&event->ip_info.ip));
-        connection_attempts = 0;
+        connection_retries = 0;
         xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_BIT);
     }
 }
@@ -43,14 +56,16 @@ static void initialize_nvs()
     ESP_ERROR_CHECK(error_code);
 }
 
-static void initialize_wifi_station()
+static esp_err_t initialize_wifi_station()
 {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     esp_netif_t* netif = esp_netif_create_default_wifi_sta();
     if (netif == NULL) {
         ESP_LOGE(WIFI_TAG, "Failed to create default Wi-Fi station interface");
+        return ESP_FAIL;
     }
+    return ESP_OK;
 }
 
 static void initialize_event_handlers()
@@ -103,7 +118,14 @@ static void start_wifi()
     ESP_ERROR_CHECK(esp_wifi_start());
 }
 
-static void wait_for_connection()
+static void initialize_mdns()
+{
+    ESP_ERROR_CHECK(mdns_init());
+    ESP_ERROR_CHECK(mdns_hostname_set(CONFIG_MDNS_HOSTNAME));
+    ESP_LOGI(WIFI_TAG, "mDNS hostname set as %s, can be resolved as %s.local", CONFIG_MDNS_HOSTNAME, CONFIG_MDNS_HOSTNAME);
+}
+
+static esp_err_t wait_for_connection()
 {
     EventBits_t wifi_event_bits = xEventGroupWaitBits(
         wifi_event_group,
@@ -115,34 +137,29 @@ static void wait_for_connection()
 
     if (wifi_event_bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(WIFI_TAG, "Connected to network %s", CONFIG_WIFI_SSID);
+        initialize_mdns();
+        return ESP_OK;
     } else if (wifi_event_bits & WIFI_FAILED_BIT) {
         ESP_LOGE(WIFI_TAG, "Failed to connect to network %s", CONFIG_WIFI_SSID);
     } else {
         ESP_LOGE(WIFI_TAG, "Unexpected event, wifi setup neither connected nor failed.");
     }
+    return ESP_FAIL;
 }
 
-static void initialize_mdns()
-{
-    ESP_ERROR_CHECK(mdns_init());
-    ESP_ERROR_CHECK(mdns_hostname_set(CONFIG_MDNS_HOSTNAME));
-    ESP_LOGI(WIFI_TAG, "mDNS hostname set as %s, can be resolved as %s.local", CONFIG_MDNS_HOSTNAME, CONFIG_MDNS_HOSTNAME);
-}
-
-void wifi_manager_init()
+esp_err_t wifi_manager_init()
 {
     // Create the event group
     wifi_event_group = xEventGroupCreate();
     if (wifi_event_group == NULL) {
         ESP_LOGE(WIFI_TAG, "Failed to create event group, aborting.");
-        return;
+        return ESP_FAIL;
     }
 
     initialize_nvs();
-    initialize_wifi_station();
+    ESP_ERROR_CHECK(initialize_wifi_station());
     initialize_event_handlers();
     configure_wifi();
     start_wifi();
-    wait_for_connection();
-    initialize_mdns();
+    return wait_for_connection();
 }
