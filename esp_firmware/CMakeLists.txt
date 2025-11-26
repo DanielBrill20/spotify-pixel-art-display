@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.5)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(esp_firmware)
-    
+
 target_link_options(${CMAKE_PROJECT_NAME}.elf PRIVATE 
     "-Wl,--undefined=__wrap_esp_log_write"
     "-Wl,--undefined=__wrap_esp_log_writev"

@@ -6,13 +6,6 @@ extern "C" {
 #endif
 
 #include "esp_err.h"
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/event_groups.h"
-#include "esp_wifi.h"
-#include "nvs_flash.h"
-#include "esp_netif.h"
-#include "mdns.h"
 
 /**
  * @brief   Connects the ESP as a WiFi station to an access point specified by menuconfig.
@@ -22,8 +15,10 @@ extern "C" {
  *          and finally connecting the station to the access point.
  *          It also utilizes FreeRTOS wait bits to halt program execution until connection is finished
  *          and an IP address is obtained. Once finished, it establishes an mDNS hostname specified by menuconfig.
+ * 
+ * @returns `ESP_OK` if WiFi connection successful, otherwise `ESP_FAIL`.
  */
-void wifi_manager_init();
+esp_err_t wifi_manager_init();
 
 #ifdef __cplusplus
 }
