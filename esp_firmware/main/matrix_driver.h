@@ -1,5 +1,5 @@
-#ifndef MATRIX_MANAGER_H
-#define MATRIX_MANAGER_H
+#ifndef MATRIX_DRIVER_H
+#define MATRIX_DRIVER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,4 +16,4 @@ esp_err_t display_screensaver();
 }
 #endif
 
-#endif // MATRIX_MANAGER_H
+#endif // MATRIX_DRIVER_H
