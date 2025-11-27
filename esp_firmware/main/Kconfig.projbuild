@@ -1,38 +1,149 @@
-menu "Project Configuration"
-    config WIFI_SSID
-        string "WiFi SSID"
-        default "mySSID"
-        help
-            SSID (network name) for the ESP to connect to.
+menu "Spotify Pixel Art Display Configuration"
+    menu "WiFi Configuration"
+        config WIFI_SSID
+            string "WiFi SSID"
+            default "mySSID"
+            help
+                SSID (network name) for the ESP to connect to.
 
-    config WIFI_PASSWORD
-        string "WiFi Password"
-        default "myPassword"
-        help
-            WiFi password for the ESP to connect to.
+        config WIFI_PASSWORD
+            string "WiFi Password"
+            default "myPassword"
+            help
+                WiFi password for the ESP to connect to.
 
-    config MAX_CONNECTION_RETRIES
-        int "Max WiFi Connection Retries"
-        default 5
-        range 1 50
-        help
-            The maximum number of retries to connect to the AP in the event of loss of connection.
+        config MAX_CONNECTION_RETRIES
+            int "Max WiFi Connection Retries"
+            default 5
+            range 1 50
+            help
+                The maximum number of retries to connect to the AP in the event of loss of connection.
 
-    config MDNS_HOSTNAME
-        string "mDNS Hostname"
-        default "LedMatrix"
-        help
-            The ESP's mDNS hostname for finding the device on the network.
+        config MDNS_HOSTNAME
+            string "mDNS Hostname"
+            default "LedMatrix"
+            help
+                The ESP's mDNS hostname for finding the device on the network.
+    endmenu
 
-    config PANEL_WIDTH
-        int "LED Panel Width"
-        default 64
-        help
-            The width, in pixels, of your HUB75 LED Matrix
+    menu "Panel Dimensions"
+        config PANEL_WIDTH
+            int "LED Panel Width"
+            default 64
+            help
+                The width, in pixels, of your HUB75 LED Matrix.
 
-    config PANEL_HEIGHT
-        int "LED Panel Height"
-        default 64
-        help
-            The height, in pixels, of your HUB75 LED Matrix
+        config PANEL_HEIGHT
+            int "LED Panel Height"
+            default 64
+            help
+                The height, in pixels, of your HUB75 LED Matrix.
+
+        config PANEL_CHAIN
+            int "LED Panels Chained"
+            default 1
+            range 1 4
+            help
+                The number of chained together HUB75 panels.
+    endmenu
+
+    menu "Pin Mappings"
+        config R1
+            int "R1 Pin"
+            default 4
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 R1 pin.
+            
+            config G1
+            int "G1 Pin"
+            default 5
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 G1 pin.
+
+            config B1
+            int "B1 Pin"
+            default 6
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 B1 pin.
+
+            config R2
+            int "R2 Pin"
+            default 17
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 R2 pin.
+
+            config G2
+            int "G2 Pin"
+            default 18
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 G2 pin.
+
+            config B2
+            int "B2 Pin"
+            default 8
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 B2 pin.
+
+            config A
+            int "A Pin"
+            default 10
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 A address pin.
+
+            config B
+            int "B Pin"
+            default 11
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 B address pin.
+
+            config C
+            int "C Pin"
+            default 12
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 C address pin.
+
+            config D
+            int "D Pin"
+            default 13
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 D address pin.
+
+            config E
+            int "E Pin"
+            default -1
+            range -1 48
+            help
+                The ESP GPIO pin controlling the HUB75 E address pin. Set to -1 if not using the E pin.
+
+            config LAT
+            int "LAT Pin"
+            default 47
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 Latch pin.
+
+            config OE
+            int "OE Pin"
+            default 21
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 Output Enable pin.
+
+            config CLK
+            int "CLK Pin"
+            default 16
+            range 1 48
+            help
+                The ESP GPIO pin controlling the HUB75 Clock pin.
+    endmenu
 endmenu
