@@ -8,6 +8,7 @@ static const char* SERVER_TAG = "http server";
 uint8_t image_buf[IMAGE_SIZE];
 
 // Declaring URI Handlers
+static esp_err_t ping_handler(httpd_req_t*);
 static esp_err_t image_handler(httpd_req_t*);
 static esp_err_t screensaver_handler(httpd_req_t*);
 
@@ -15,6 +16,12 @@ static esp_err_t screensaver_handler(httpd_req_t*);
 static httpd_handle_t server;
 
 // URIs
+static httpd_uri_t ping_uri = {
+    .uri = "/ping",
+    .method = HTTP_HEAD,
+    .handler = ping_handler,
+    .user_ctx = NULL
+};
 static httpd_uri_t image_uri = {
     .uri = "/image",
     .method = HTTP_POST,
@@ -29,6 +36,11 @@ static httpd_uri_t screensaver_uri = {
 };
 
 // URI Handlers
+static esp_err_t ping_handler(httpd_req_t* req)
+{
+    return httpd_resp_send(req, NULL, 0);
+}
+
 static esp_err_t image_handler(httpd_req_t* req)
 {
     if (req->content_len != IMAGE_SIZE) {
@@ -78,6 +90,7 @@ static void start_server()
 
 static void register_uri_handlers()
 {
+    ESP_ERROR_CHECK(httpd_register_uri_handler(server, &ping_uri));
     ESP_ERROR_CHECK(httpd_register_uri_handler(server, &image_uri));
     ESP_ERROR_CHECK(httpd_register_uri_handler(server, &screensaver_uri));
     ESP_LOGI(SERVER_TAG, "URI handlers registered");
