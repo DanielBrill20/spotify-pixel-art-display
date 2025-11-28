@@ -9,19 +9,27 @@ static MatrixPanel_I2S_DMA* matrix = nullptr;
 
 esp_err_t display_image()
 {
+    if (!matrix) {
+        ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
+        return ESP_FAIL;
+    }
     for (uint16_t i = 0; i < IMAGE_SIZE; i++) {
         const uint8_t r = image_buf[i];
         const uint8_t g = image_buf[i+1];
         const uint8_t b = image_buf[i+2];
         const uint8_t x = (i / 3) % CONFIG_PANEL_WIDTH;
         const uint8_t y = (i / 3) / CONFIG_PANEL_WIDTH;
+        matrix->drawPixelRGB888(x, y, r, g, b);
     }
+    matrix->flipDMABuffer();
+    ESP_LOGI(MATRIX_TAG, "Image drawn successfully");
     return ESP_OK;
 }
 
 esp_err_t display_screensaver()
 {
-    //
+    matrix->clearScreen();
+    matrix->flipDMABuffer();
     return ESP_OK;
 }
 
@@ -37,6 +45,7 @@ esp_err_t matrix_driver_init()
     HUB75_I2S_CFG config(CONFIG_PANEL_WIDTH, CONFIG_PANEL_HEIGHT,
                         CONFIG_PANEL_CHAIN, _pins);
     config.clkphase = false;
+    config.double_buff = true;
     matrix = new MatrixPanel_I2S_DMA(config);
     if (!matrix) {
         ESP_LOGE(MATRIX_TAG, "Matrix allocation failed");
