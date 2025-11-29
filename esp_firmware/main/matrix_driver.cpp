@@ -3,6 +3,8 @@
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 #include "esp_log.h"
 
+#define PANEL_BRIGHTNESS 40
+
 static const char* MATRIX_TAG = "matrix driver";
 
 static MatrixPanel_I2S_DMA* matrix = nullptr;
@@ -28,6 +30,11 @@ esp_err_t display_image()
 
 esp_err_t display_screensaver()
 {
+    if (!matrix) {
+        ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
+        return ESP_FAIL;
+    }
+    // TODO: Design an actual screensaver
     matrix->clearScreen();
     matrix->flipDMABuffer();
     return ESP_OK;
@@ -58,7 +65,7 @@ esp_err_t matrix_driver_init()
         return ESP_FAIL;
     }
     matrix->clearScreen();
-    matrix->setPanelBrightness(40);
+    matrix->setPanelBrightness(PANEL_BRIGHTNESS);
     ESP_LOGI(MATRIX_TAG, "Matrix initialized: %dx%d, %d chained panels",
         CONFIG_PANEL_WIDTH, CONFIG_PANEL_HEIGHT, CONFIG_PANEL_CHAIN);
     return ESP_OK;
