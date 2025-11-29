@@ -13,7 +13,7 @@ esp_err_t display_image()
         ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
         return ESP_FAIL;
     }
-    for (uint16_t i = 0; i < IMAGE_SIZE; i++) {
+    for (uint16_t i = 0; i < IMAGE_SIZE; i += 3) {
         const uint8_t r = image_buf[i];
         const uint8_t g = image_buf[i+1];
         const uint8_t b = image_buf[i+2];
