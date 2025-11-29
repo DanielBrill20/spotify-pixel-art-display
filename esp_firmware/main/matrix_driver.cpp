@@ -9,6 +9,16 @@ static const char* MATRIX_TAG = "matrix driver";
 
 static MatrixPanel_I2S_DMA* matrix = nullptr;
 
+static esp_err_t matrix_driver_deinit()
+{
+    if (matrix) {
+        delete matrix;
+        matrix = nullptr;
+        ESP_LOGI(MATRIX_TAG, "Matrix deinitialized");
+    }
+    return ESP_OK;
+}
+
 esp_err_t display_image()
 {
     if (!matrix) {
@@ -16,12 +26,13 @@ esp_err_t display_image()
         return ESP_FAIL;
     }
     for (uint16_t i = 0; i < IMAGE_SIZE; i += 3) {
-        const uint8_t r = image_buf[i];
-        const uint8_t g = image_buf[i+1];
-        const uint8_t b = image_buf[i+2];
-        const uint8_t x = (i / 3) % CONFIG_PANEL_WIDTH;
-        const uint8_t y = (i / 3) / CONFIG_PANEL_WIDTH;
-        matrix->drawPixelRGB888(x, y, r, g, b);
+        const uint16_t pixel = i / 3;
+        const uint16_t x = pixel % CONFIG_PANEL_WIDTH;
+        const uint16_t y = pixel / CONFIG_PANEL_WIDTH;
+        matrix->drawPixelRGB888(x, y,
+                                image_buf[i],
+                                image_buf[i+1],
+                                image_buf[i+2]);
     }
     matrix->flipDMABuffer();
     ESP_LOGI(MATRIX_TAG, "Image drawn successfully");
@@ -42,6 +53,7 @@ esp_err_t display_screensaver()
 
 esp_err_t matrix_driver_init()
 {
+    ESP_ERROR_CHECK(matrix_driver_deinit());
     HUB75_I2S_CFG::i2s_pins _pins = {CONFIG_R1, CONFIG_G1,
                                     CONFIG_B1, CONFIG_R2,
                                     CONFIG_G2, CONFIG_B2,
@@ -60,8 +72,7 @@ esp_err_t matrix_driver_init()
     }
     if (!matrix->begin()) {
         ESP_LOGE(MATRIX_TAG, "Matrix failed to begin");
-        delete matrix;
-        matrix = nullptr;
+        ESP_ERROR_CHECK(matrix_driver_deinit());
         return ESP_FAIL;
     }
     matrix->clearScreen();
