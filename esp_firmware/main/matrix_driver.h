@@ -29,7 +29,7 @@ esp_err_t display_screensaver();
  *          Starts matrix with a clear screen and proper brightness.
  * 
  * @returns `ESP_OK` if panel initialization is successful,
- *          `ESP_ERR_NO_MEM` if `MatrixPanel_I2S_DMA` fails,
+ *          `ESP_ERR_NO_MEM` if `MatrixPanel_I2S_DMA` allocation fails,
  *          otherwise `ESP_FAIL`.
  */
 esp_err_t matrix_driver_init();
