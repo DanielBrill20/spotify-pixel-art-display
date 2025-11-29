@@ -53,7 +53,7 @@ static esp_err_t image_handler(httpd_req_t* req)
     }
 
     ESP_LOGI(SERVER_TAG, "Received %u bytes of image data", received);
-    display_image();
+    ESP_ERROR_CHECK(display_image());
 
     httpd_resp_sendstr(req, "Successfully uploaded image");
     return ESP_OK;
@@ -62,7 +62,7 @@ static esp_err_t image_handler(httpd_req_t* req)
 static esp_err_t screensaver_handler(httpd_req_t* req)
 {
     ESP_LOGI(SERVER_TAG, "Received screensaver intent");
-    display_screensaver();
+    ESP_ERROR_CHECK(display_screensaver());
 
     httpd_resp_sendstr(req, "Received screensaver intent");
     return ESP_OK;

@@ -28,7 +28,7 @@ esp_err_t display_screensaver();
  *          Enables double buffer for smoother image transitions.
  *          Starts matrix with a clear screen and proper brightness.
  * 
- * @returns `ESP_OK` if panel intialization is successful,
+ * @returns `ESP_OK` if panel initialization is successful,
  *          `ESP_ERR_NO_MEM` if `MatrixPanel_I2S_DMA` fails,
  *          otherwise `ESP_FAIL`.
  */
