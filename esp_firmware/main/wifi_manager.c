@@ -26,7 +26,7 @@ static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_
         ESP_LOGI(WIFI_TAG, "Connection to AP started successfully");
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         wifi_event_sta_disconnected_t* event = (wifi_event_sta_disconnected_t*) event_data;
-        ESP_LOGW(WIFI_TAG, "Disconnected from AP %s with reason %d", event->ssid, event->reason);
+        ESP_LOGW(WIFI_TAG, "Disconnected from AP with reason %d", event->reason);
         xEventGroupClearBits(wifi_event_group, WIFI_CONNECTED_BIT);
         if (connection_retries < CONFIG_MAX_CONNECTION_RETRIES) {
             ESP_LOGW(WIFI_TAG, "Retrying connection (%u/%d)...", connection_retries+1, CONFIG_MAX_CONNECTION_RETRIES);
