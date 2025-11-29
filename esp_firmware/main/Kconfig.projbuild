@@ -120,7 +120,7 @@ menu "Spotify Pixel Art Display Configuration"
 
         config E
             int "E Pin"
-            default -1
+            default 9
             range -1 48
             help
                 The ESP GPIO pin controlling the HUB75 E address pin. Set to -1 if not using the E pin.
