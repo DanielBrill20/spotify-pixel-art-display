@@ -15,6 +15,10 @@ TARGET_RESOLUTION = 64  # The physical LED matrix resolution
 ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
 REQUIRED_ENVS = ('CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI')
 POLLING_INTERVAL = 0.5
+MC_HOSTNAME = 'LedMatrix'
+IMAGE_ENDPOINT = f'http://{MC_HOSTNAME}.local/image'
+SCREENSAVER_ENDPOINT = f'http://{MC_HOSTNAME}.local/screensaver'
+POST_TIMEOUT = 7
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -139,11 +143,25 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
     return image.tobytes()  # Much faster than image.load() and iterating over pixel data
 
 def send_album_cover(art_bytes: bytes) -> None:
-    # TODO: Send ESP image bytes to display
+    try:
+        requests.post(IMAGE_ENDPOINT,
+                      data=art_bytes,
+                      headers={'Content-Type': 'application/octet-stream'},
+                      timeout=POST_TIMEOUT)
+    except:
+        logger.warning('Failed to send image to MC')
+        return
+    logger.info('Successfully sent image to MC')
     return
 
 def send_screensaver_intent() -> None:
-    # TODO: Tell ESP to switch to screensaver mode
+    try:
+        requests.post(SCREENSAVER_ENDPOINT,
+                      timeout=POST_TIMEOUT)
+    except:
+        logger.warning('Failed to send screensaver intent to MC')
+        return
+    logger.info('Successfully sent screensaver intent to MC')
     return
 
 def snooze(iter_start: float) -> None:
@@ -165,6 +183,7 @@ def main():
         logger.critical(f'Startup failed: {e}')
         sys.exit(1)
     current_album_id = None
+    send_screensaver_intent()
 
     while True:
         try:
