@@ -1,6 +1,5 @@
 #include "matrix_driver.h"
 #include "http_server.h"
-#include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 #include <cstdint>
 #include "esp_log.h"
 
@@ -8,7 +7,7 @@
 
 static const char* MATRIX_TAG = "matrix driver";
 
-static MatrixPanel_I2S_DMA* matrix = nullptr;
+MatrixPanel_I2S_DMA* matrix = nullptr;
 
 static esp_err_t matrix_driver_deinit()
 {
