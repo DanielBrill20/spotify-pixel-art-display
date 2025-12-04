@@ -1,6 +1,7 @@
 #include "matrix_driver.h"
 #include "http_server.h"
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
+#include <cstdint>
 #include "esp_log.h"
 
 #define PANEL_BRIGHTNESS 40
