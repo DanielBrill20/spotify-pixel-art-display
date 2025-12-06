@@ -1,4 +1,5 @@
 #include "matrix_driver.h"
+#include "life_screensaver.h"
 #include "http_server.h"
 #include <cstdint>
 #include "esp_log.h"
@@ -8,6 +9,11 @@
 static const char* MATRIX_TAG = "matrix driver";
 
 MatrixPanel_I2S_DMA* matrix = nullptr;
+
+static void stop_screensaver()
+{
+    stop_game_of_life();
+}
 
 static esp_err_t matrix_driver_deinit()
 {
@@ -21,6 +27,7 @@ static esp_err_t matrix_driver_deinit()
 
 esp_err_t display_image()
 {
+    stop_screensaver();
     if (!matrix) {
         ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
         return ESP_FAIL;
@@ -45,9 +52,7 @@ esp_err_t display_screensaver()
         ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
         return ESP_FAIL;
     }
-    // TODO: Design an actual screensaver
-    matrix->clearScreen();
-    matrix->flipDMABuffer();
+    run_game_of_life();
     return ESP_OK;
 }
 
