@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "esp_log.h"
 
-#define PANEL_BRIGHTNESS 40
+#define PANEL_BRIGHTNESS CONFIG_PANEL_BRIGHTNESS
 
 static const char* MATRIX_TAG = "matrix driver";
 
