@@ -15,11 +15,11 @@ extern "C" {
 esp_err_t run_game_of_life();
 
 /**
- * @brief   Stops the Conway's Game of Life screensaver, stopping the timer and clearing the matrix.
+ * @brief   Stops the Conway's Game of Life screensaver by stopping internal timer.
  * 
- * @returns `ESP_OK` if game stops successfully, otherwise `ESP_FAIL` if matrix is uninitialized.
+ * @note    Doesn't return anything. If the timer is not running, nothing will happen.
  */
-esp_err_t stop_game_of_life();
+void stop_game_of_life();
 
 #ifdef __cplusplus
 }
