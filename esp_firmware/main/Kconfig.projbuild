@@ -26,7 +26,7 @@ menu "Spotify Pixel Art Display Configuration"
                 The ESP's mDNS hostname for finding the device on the network.
     endmenu
 
-    menu "Panel Configuration"
+    menu "Panel Dimensions"
         config PANEL_WIDTH
             int "LED Panel Width"
             default 64
@@ -45,13 +45,6 @@ menu "Spotify Pixel Art Display Configuration"
             range 1 4
             help
                 The number of chained together HUB75 panels.
-
-        config PANEL_BRIGHTNESS
-            int "LED Panel Brightness"
-            default 128
-            range 1 255
-            help
-                The panel brightness, represented linearly (128 should appear roughly half as bright as 255).
     endmenu
 
     menu "Pin Mappings"
