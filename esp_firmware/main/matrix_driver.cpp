@@ -10,9 +10,16 @@ static const char* MATRIX_TAG = "matrix driver";
 
 MatrixPanel_I2S_DMA* matrix = nullptr;
 
-static void stop_screensaver()
+static esp_err_t stop_screensaver()
 {
+    if (!matrix) {
+        ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
+        return ESP_FAIL;
+    }
+    matrix->clearScreen();
+    matrix->flipDMABuffer();
     stop_game_of_life();
+    return ESP_OK;
 }
 
 static esp_err_t matrix_driver_deinit()
@@ -27,7 +34,7 @@ static esp_err_t matrix_driver_deinit()
 
 esp_err_t display_image()
 {
-    stop_screensaver();
+    ESP_ERROR_CHECK(stop_screensaver());
     if (!matrix) {
         ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
         return ESP_FAIL;

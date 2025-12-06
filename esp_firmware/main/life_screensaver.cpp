@@ -138,16 +138,9 @@ esp_err_t run_game_of_life()
     return ESP_OK;
 }
 
-esp_err_t stop_game_of_life()
+void stop_game_of_life()
 {
-    if (!matrix) {
-        ESP_LOGE(LIFE_TAG, "Attempting to show screensaver on uninitialized matrix");
-        return ESP_FAIL;
-    }
-    matrix->clearScreen();
-    matrix->flipDMABuffer();
-    ESP_ERROR_CHECK(esp_timer_stop(tick_timer));
+    esp_timer_stop(tick_timer); // Not using error checking here. If timer is not running, no need to abort.
     life_state = {};
     ESP_LOGI(LIFE_TAG, "Stopped Game of Life screensaver");
-    return ESP_OK;
 }
