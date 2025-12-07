@@ -26,9 +26,9 @@ typedef struct LifeState_t {
 static const char* LIFE_TAG = "life screensaver";
 
 static LifeState_t life_state = {};
-static esp_timer_handle_t tick_timer;
+static esp_timer_handle_t tick_timer = nullptr;
 
-static void raindbow_transition(LifeState_t* state)
+static void rainbow_transition(LifeState_t* state)
 {
     if (state->r == UINT8_MAX) {
         if (state->b == 0 && state->g != UINT8_MAX) {
@@ -60,7 +60,8 @@ static void draw_next_tick(void* arg)
 {
     matrix->clearScreen();
     LifeState_t* state = (LifeState_t*)arg;
-    raindbow_transition(state);
+    state->next_tick = {};
+    rainbow_transition(state);
     for (uint16_t y = 0; y < CONFIG_PANEL_HEIGHT; y++) {
         for (uint16_t x = 0; x < CONFIG_PANEL_WIDTH; x++) {
             uint8_t neighbors = 0;
@@ -88,7 +89,6 @@ static void draw_next_tick(void* arg)
         "Drew next GoL tick on matrix with color R: %u G: %u B: %u",
         state->r, state->g, state->b);
     state->current_tick = state->next_tick; // Direct assignment, an advantage of std::array
-    state->next_tick = {};
 }
 
 static void draw_first_tick(float density, LifeState_t* state)
@@ -99,7 +99,7 @@ static void draw_first_tick(float density, LifeState_t* state)
     } else if (density < MINIMUM_DENSITY) {
         density = MINIMUM_DENSITY;
     }
-    uint32_t cutoff = UINT32_MAX * density;
+    uint32_t cutoff = (uint32_t)((float)UINT32_MAX * density);
     for (uint16_t y = 0; y < CONFIG_PANEL_HEIGHT; y++) {
         for (uint16_t x = 0; x < CONFIG_PANEL_WIDTH; x++) {
             if (esp_random() <= cutoff) {
@@ -122,6 +122,7 @@ esp_err_t run_game_of_life()
         ESP_LOGE(LIFE_TAG, "Attempting to show screensaver on uninitialized matrix");
         return ESP_FAIL;
     }
+    life_state = {};
     life_state.r = UINT8_MAX;
     draw_first_tick(STARTING_DENSITY, &life_state);
 
@@ -133,7 +134,7 @@ esp_err_t run_game_of_life()
         };
         ESP_ERROR_CHECK(esp_timer_create(&tick_timer_args, &tick_timer));
     }
-    esp_timer_start_periodic(tick_timer, TICK_MS * MICROSEC_PER_MS);
+    ESP_ERROR_CHECK(esp_timer_start_periodic(tick_timer, TICK_MS * MICROSEC_PER_MS));
     ESP_LOGI(LIFE_TAG, "Started Game of Life screensaver with %d ms tick duration", TICK_MS);
     return ESP_OK;
 }

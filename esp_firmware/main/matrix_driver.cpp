@@ -14,9 +14,9 @@ static esp_err_t stop_screensaver()
         ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
         return ESP_FAIL;
     }
+    stop_game_of_life();
     matrix->clearScreen();
     matrix->flipDMABuffer();
-    stop_game_of_life();
     return ESP_OK;
 }
 
@@ -57,7 +57,7 @@ esp_err_t display_screensaver()
         ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
         return ESP_FAIL;
     }
-    run_game_of_life();
+    ESP_ERROR_CHECK(run_game_of_life());
     return ESP_OK;
 }
 
