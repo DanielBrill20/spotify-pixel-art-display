@@ -4,8 +4,6 @@
 #include <cstdint>
 #include "esp_log.h"
 
-#define PANEL_BRIGHTNESS CONFIG_PANEL_BRIGHTNESS
-
 static const char* MATRIX_TAG = "matrix driver";
 
 MatrixPanel_I2S_DMA* matrix = nullptr;
@@ -88,7 +86,7 @@ esp_err_t matrix_driver_init()
         return ESP_FAIL;
     }
     matrix->clearScreen();
-    matrix->setPanelBrightness(PANEL_BRIGHTNESS);
+    matrix->setPanelBrightness(CONFIG_PANEL_BRIGHTNESS);
     ESP_LOGI(MATRIX_TAG, "Matrix initialized: %dx%d, %d chained panels",
         CONFIG_PANEL_WIDTH, CONFIG_PANEL_HEIGHT, CONFIG_PANEL_CHAIN);
     return ESP_OK;
