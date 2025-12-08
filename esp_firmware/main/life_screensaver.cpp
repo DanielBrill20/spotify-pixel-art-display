@@ -144,6 +144,5 @@ void stop_game_of_life()
     if (tick_timer) {
         esp_timer_stop(tick_timer); // Not using error checking here. If timer is not running, no need to abort.
     }
-    life_state = {};
     ESP_LOGI(LIFE_TAG, "Stopped Game of Life screensaver");
 }
