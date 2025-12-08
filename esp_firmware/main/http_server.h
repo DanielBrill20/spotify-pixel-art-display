@@ -11,6 +11,10 @@ extern "C" {
 
 #define IMAGE_SIZE (CONFIG_PANEL_WIDTH * CONFIG_PANEL_HEIGHT * 3)
 
+/**
+ * @brief   Global image buffer of size (CONFIG_PANEL_WIDTH * CONFIG_PANEL_HEIGHT * 3).
+ *          Used to store album art RGB data in .BSS storage to avoid stack overflow.
+ */
 extern uint8_t image_buf[IMAGE_SIZE];
 
 /**
