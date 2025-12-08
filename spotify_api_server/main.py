@@ -159,9 +159,9 @@ def send_album_cover(art_bytes: bytes) -> bool:
                       timeout=POST_TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
-        logger.warning(f'Failed to send image to MC: {e}')
+        logger.warning(f'Failed to send image to MCU: {e}')
         return False
-    logger.info('Successfully sent image to MC')
+    logger.info('Successfully sent image to MCU')
     return True
 
 def send_screensaver_intent() -> bool:
@@ -176,9 +176,9 @@ def send_screensaver_intent() -> bool:
                       timeout=POST_TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
-        logger.warning(f'Failed to send screensaver intent to MC: {e}')
+        logger.warning(f'Failed to send screensaver intent to MCU: {e}')
         return False
-    logger.info('Successfully sent screensaver intent to MC')
+    logger.info('Successfully sent screensaver intent to MCU')
     return True
 
 def snooze(iter_start: float) -> None:
