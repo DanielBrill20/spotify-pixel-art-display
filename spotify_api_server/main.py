@@ -15,9 +15,9 @@ TARGET_RESOLUTION = 64  # The physical LED matrix resolution
 ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RESOLUTION, should also evenly divide TARGET_RESOLUTION
 REQUIRED_ENVS = ('CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI')
 POLLING_INTERVAL = 0.5
-MC_HOSTNAME = 'LedMatrix'
-IMAGE_ENDPOINT = f'http://{MC_HOSTNAME}.local/image'
-SCREENSAVER_ENDPOINT = f'http://{MC_HOSTNAME}.local/screensaver'
+MDNS_HOSTNAME = 'LedMatrix'
+IMAGE_ENDPOINT = f'http://{MDNS_HOSTNAME}.local/image'
+SCREENSAVER_ENDPOINT = f'http://{MDNS_HOSTNAME}.local/screensaver'
 POST_TIMEOUT = (2, 5)  # (connect, read)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -144,22 +144,24 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
 
 def send_album_cover(art_bytes: bytes) -> bool:
     try:
-        requests.post(IMAGE_ENDPOINT,
+        resp = requests.post(IMAGE_ENDPOINT,
                       data=art_bytes,
                       headers={'Content-Type': 'application/octet-stream'},
                       timeout=POST_TIMEOUT)
-    except:
-        logger.warning('Failed to send image to MC')
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        logger.warning('Failed to send image to MC: {e}')
         return False
     logger.info('Successfully sent image to MC')
     return True
 
 def send_screensaver_intent() -> bool:
     try:
-        requests.post(SCREENSAVER_ENDPOINT,
+        resp = requests.post(SCREENSAVER_ENDPOINT,
                       timeout=POST_TIMEOUT)
-    except:
-        logger.warning('Failed to send screensaver intent to MC')
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        logger.warning('Failed to send screensaver intent to MC: {e}')
         return False
     logger.info('Successfully sent screensaver intent to MC')
     return True
