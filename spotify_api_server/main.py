@@ -143,6 +143,15 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
     return image.tobytes()  # Much faster than image.load() and iterating over pixel data
 
 def send_album_cover(art_bytes: bytes) -> bool:
+    """
+    Sends the album cover image bytes to the ESP MCU /image endpoint. Fails gracefully if unsuccessful.
+
+    Parameters:
+        art_bytes (bytes): The bytes containing the image's RGB data.
+
+    Returns:
+        bool: Whether or not the POST request was sent (and received) successfully.
+    """
     try:
         resp = requests.post(IMAGE_ENDPOINT,
                       data=art_bytes,
@@ -156,6 +165,12 @@ def send_album_cover(art_bytes: bytes) -> bool:
     return True
 
 def send_screensaver_intent() -> bool:
+    """
+    Sends an intent to the ESP MCU /screensaver endpoint. Fails gracefully if unsuccessful.
+
+    Returns:
+        bool: Whether or not the POST request was sent (and received) successfully.
+    """
     try:
         resp = requests.post(SCREENSAVER_ENDPOINT,
                       timeout=POST_TIMEOUT)
