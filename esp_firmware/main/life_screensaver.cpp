@@ -15,7 +15,7 @@
 
 typedef std::array<std::array<bool, CONFIG_PANEL_WIDTH>, CONFIG_PANEL_HEIGHT> Tick_t;
 
-typedef struct LifeState_t {
+struct LifeState_t {
     Tick_t current_tick;
     Tick_t next_tick;
     uint8_t r;
@@ -85,7 +85,7 @@ static void draw_next_tick(void* arg)
         }
     }
     matrix->flipDMABuffer();
-    ESP_LOGI(LIFE_TAG,
+    ESP_LOGD(LIFE_TAG,
         "Drew next GoL tick on matrix with color R: %u G: %u B: %u",
         state->r, state->g, state->b);
     state->current_tick = state->next_tick; // Direct assignment, an advantage of std::array
@@ -109,7 +109,7 @@ static void draw_first_tick(float density, LifeState_t* state)
         }
     }
     matrix->flipDMABuffer();
-    ESP_LOGI(LIFE_TAG,
+    ESP_LOGD(LIFE_TAG,
         "Drew randomly generated GoL tick on matrix with color R: %u G: %u B: %u",
         state->r, state->g, state->b);
 }
