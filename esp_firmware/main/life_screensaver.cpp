@@ -11,7 +11,7 @@
 #define COLOR_INCREMENT 15
 #define STARTING_DENSITY 0.5
 #define MINIMUM_DENSITY 0.05
-#define MAXIMUM_DENSITY 1
+#define MAXIMUM_DENSITY 1.0
 
 typedef std::array<std::array<bool, CONFIG_PANEL_WIDTH>, CONFIG_PANEL_HEIGHT> Tick_t;
 
@@ -141,7 +141,9 @@ esp_err_t run_game_of_life()
 
 void stop_game_of_life()
 {
-    esp_timer_stop(tick_timer); // Not using error checking here. If timer is not running, no need to abort.
+    if (tick_timer) {
+        esp_timer_stop(tick_timer); // Not using error checking here. If timer is not running, no need to abort.
+    }
     life_state = {};
     ESP_LOGI(LIFE_TAG, "Stopped Game of Life screensaver");
 }
