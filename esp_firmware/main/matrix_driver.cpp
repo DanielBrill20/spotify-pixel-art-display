@@ -10,10 +10,6 @@ MatrixPanel_I2S_DMA* matrix = nullptr;
 
 static esp_err_t stop_screensaver()
 {
-    if (!matrix) {
-        ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
-        return ESP_FAIL;
-    }
     stop_game_of_life();
     matrix->clearScreen();
     matrix->flipDMABuffer();
@@ -32,11 +28,11 @@ static esp_err_t matrix_driver_deinit()
 
 esp_err_t display_image()
 {
-    ESP_ERROR_CHECK(stop_screensaver());
     if (!matrix) {
         ESP_LOGE(MATRIX_TAG, "Matrix uninitialized");
         return ESP_FAIL;
     }
+    ESP_ERROR_CHECK(stop_screensaver());
     for (uint16_t i = 0; i < IMAGE_SIZE; i += 3) {
         const uint16_t pixel = i / 3;
         const uint16_t x = pixel % CONFIG_PANEL_WIDTH;
