@@ -18,7 +18,7 @@ POLLING_INTERVAL = 0.5
 MC_HOSTNAME = 'LedMatrix'
 IMAGE_ENDPOINT = f'http://{MC_HOSTNAME}.local/image'
 SCREENSAVER_ENDPOINT = f'http://{MC_HOSTNAME}.local/screensaver'
-POST_TIMEOUT = 7
+POST_TIMEOUT = (2, 5)  # (connect, read)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -142,7 +142,7 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
         image = image.convert('RGB')
     return image.tobytes()  # Much faster than image.load() and iterating over pixel data
 
-def send_album_cover(art_bytes: bytes) -> None:
+def send_album_cover(art_bytes: bytes) -> bool:
     try:
         requests.post(IMAGE_ENDPOINT,
                       data=art_bytes,
@@ -150,19 +150,19 @@ def send_album_cover(art_bytes: bytes) -> None:
                       timeout=POST_TIMEOUT)
     except:
         logger.warning('Failed to send image to MC')
-        return
+        return False
     logger.info('Successfully sent image to MC')
-    return
+    return True
 
-def send_screensaver_intent() -> None:
+def send_screensaver_intent() -> bool:
     try:
         requests.post(SCREENSAVER_ENDPOINT,
                       timeout=POST_TIMEOUT)
     except:
         logger.warning('Failed to send screensaver intent to MC')
-        return
+        return False
     logger.info('Successfully sent screensaver intent to MC')
-    return
+    return True
 
 def snooze(iter_start: float) -> None:
     """
@@ -182,8 +182,11 @@ def main():
         # Will catch SpotifyOauthError if OAuth fails, and failures with .env
         logger.critical(f'Startup failed: {e}')
         sys.exit(1)
+
     current_album_id = None
-    send_screensaver_intent()
+    screensaver_active = False
+    if send_screensaver_intent():
+        screensaver_active = True
 
     while True:
         try:
@@ -191,9 +194,10 @@ def main():
             track_response = spotify_client.currently_playing(additional_types='episode')
 
             if not track_response or not track_response.get('item'):
-                if current_album_id is not None:
-                    current_album_id = None
-                    send_screensaver_intent()
+                current_album_id = None
+                if not screensaver_active:
+                    if send_screensaver_intent():
+                        screensaver_active = True
                 snooze(iter_start)
                 continue
             
@@ -212,8 +216,9 @@ def main():
 
             cover_url = get_image_url(album)
             art_bytes = generate_byte_arr(cover_url)
-            send_album_cover(art_bytes)
-            current_album_id = album_id  # Only update after matrix updated
+            if send_album_cover(art_bytes):
+                current_album_id = album_id  # Only update after matrix updated
+                screensaver_active = False
             snooze(iter_start)
         except Exception as e:
             logger.exception(e)
