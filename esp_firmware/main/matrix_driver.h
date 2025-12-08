@@ -3,6 +3,9 @@
 
 #ifdef __cplusplus
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
+/**
+ * @brief   Global pointer to a single HUB75 LED matrix, initialized by `matrix_driver_init()`.
+ */
 extern MatrixPanel_I2S_DMA* matrix;
 extern "C" {
 #endif
