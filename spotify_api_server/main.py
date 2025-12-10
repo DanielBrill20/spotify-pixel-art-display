@@ -6,7 +6,7 @@ import time
 from typing import Any, Dict
 
 from dotenv import find_dotenv, load_dotenv
-from PIL import Image
+from PIL import Image, ImageOps
 import requests
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -18,7 +18,7 @@ POLLING_INTERVAL = 0.5
 MDNS_HOSTNAME = 'LedMatrix'
 IMAGE_ENDPOINT = f'http://{MDNS_HOSTNAME}.local/image'
 SCREENSAVER_ENDPOINT = f'http://{MDNS_HOSTNAME}.local/screensaver'
-POST_TIMEOUT = (2, 5)  # (connect, read)
+POST_TIMEOUT = 5
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -140,6 +140,17 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
         image = image.resize((TARGET_RESOLUTION, TARGET_RESOLUTION), resample=Image.Resampling.NEAREST)
     if image.mode != 'RGB':
         image = image.convert('RGB')
+    # Sometimes the Spotify API claims an image is certain dimensions when in reality it's not
+    if image.width != TARGET_RESOLUTION or image.height != TARGET_RESOLUTION:
+        logger.warning(
+            f'Image was not the right size. '
+            f'Expected: {TARGET_RESOLUTION}x{TARGET_RESOLUTION}. '
+            f'Actual: {image.width}x{image.height}. Padding image to fit...')
+        image = ImageOps.pad(
+            image=image,
+            size=(TARGET_RESOLUTION, TARGET_RESOLUTION),
+            method=Image.Resampling.LANCZOS,
+            color=(0, 0, 0))
     return image.tobytes()  # Much faster than image.load() and iterating over pixel data
 
 def send_album_cover(art_bytes: bytes) -> bool:
@@ -155,7 +166,8 @@ def send_album_cover(art_bytes: bytes) -> bool:
     try:
         resp = requests.post(IMAGE_ENDPOINT,
                       data=art_bytes,
-                      headers={'Content-Type': 'application/octet-stream'},
+                      headers={'Content-Type': 'application/octet-stream',
+                               'Connection': 'close'},
                       timeout=POST_TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
@@ -173,6 +185,7 @@ def send_screensaver_intent() -> bool:
     """
     try:
         resp = requests.post(SCREENSAVER_ENDPOINT,
+                      headers={'Connection': 'close'},
                       timeout=POST_TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
