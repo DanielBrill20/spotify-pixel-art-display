@@ -51,14 +51,16 @@ def resolve_mdns(mdns_hostname: str) -> str:
     Parameters:
         mdns_hostname (str): The MCU mDNS hostname to resolve.
 
-    Returns
+    Returns:
         str: The IP address the hostname resolves to.
         If resolution fails, this function simply returns hostname.local.
     """
     try:
         return socket.gethostbyname(f'{mdns_hostname}.local')
-    except Exception:
-        logger.warning('Failed to resolve mDNS hostname on init. Using hostname.local (will resolve on connect).')
+    except OSError as e:
+        logger.warning(f'Failed to resolve mDNS hostname on init. '
+                       f'Using hostname.local (will resolve on connect). '
+                       f'Error: {e}')
         return f'{mdns_hostname}.local'
     
 def load_and_validate_env() -> Dict[str, str]:
