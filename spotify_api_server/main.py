@@ -187,8 +187,7 @@ def send_album_cover(url: str, art_bytes: bytes) -> bool:
     try:
         resp = esp_session.post(url,
                       data=art_bytes,
-                      headers={'Content-Type': 'application/octet-stream',
-                               'Content-Length': str(len(art_bytes))},
+                      headers={'Content-Type': 'application/octet-stream'},
                       timeout=POST_TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
