@@ -1,6 +1,7 @@
 from io import BytesIO
 import logging
 import os
+import socket
 import sys
 import time
 from typing import Any, Dict
@@ -16,9 +17,9 @@ ART_RESOLUTION = 64  # The desired pixel art resolution, cannot exceed TARGET_RE
 REQUIRED_ENVS = ('CLIENT_ID', 'CLIENT_SECRET', 'REDIRECT_URI')
 POLLING_INTERVAL = 0.5
 MDNS_HOSTNAME = 'LedMatrix'
-IMAGE_ENDPOINT = f'http://{MDNS_HOSTNAME}.local/image'
-SCREENSAVER_ENDPOINT = f'http://{MDNS_HOSTNAME}.local/screensaver'
 POST_TIMEOUT = 5
+esp_session = requests.Session()
+spotify_session = requests.Session()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -42,6 +43,23 @@ class CoverURL:
     @property
     def oversized(self) -> bool:
         return self._oversized
+    
+def resolve_mdns(mdns_hostname: str) -> str:
+    """
+    Resolves the MCU mDNS hostname to an IP address. Useful to avoid resolving with each HTTP request.
+
+    Parameters:
+        mdns_hostname (str): The MCU mDNS hostname to resolve.
+
+    Returns
+        str: The IP address the hostname resolves to.
+        If resolution fails, this function simply returns hostname.local.
+    """
+    try:
+        return socket.gethostbyname(f'{mdns_hostname}.local')
+    except Exception:
+        logger.warning('Failed to resolve mDNS hostname on init. Using hostname.local (will resolve on connect).')
+        return f'{mdns_hostname}.local'
     
 def load_and_validate_env() -> Dict[str, str]:
     """
@@ -118,7 +136,7 @@ def get_image_src_bytes(url: str) -> bytes:
     Raises:
         HTTPError: If the request fails.
     """
-    response = requests.get(url, timeout=3)
+    response = spotify_session.get(url, timeout=3)
     response.raise_for_status()
     return response.content
 
@@ -153,21 +171,22 @@ def generate_byte_arr(cover_url: CoverURL) -> bytes:
             color=(0, 0, 0))
     return image.tobytes()  # Much faster than image.load() and iterating over pixel data
 
-def send_album_cover(art_bytes: bytes) -> bool:
+def send_album_cover(url: str, art_bytes: bytes) -> bool:
     """
     Sends the album cover image bytes to the ESP MCU /image endpoint. Fails gracefully if unsuccessful.
 
     Parameters:
+        url (str): The url of the MCU /image endpoint.
         art_bytes (bytes): The bytes containing the image's RGB data.
 
     Returns:
         bool: Whether or not the POST request was sent (and received) successfully.
     """
     try:
-        resp = requests.post(IMAGE_ENDPOINT,
+        resp = esp_session.post(url,
                       data=art_bytes,
                       headers={'Content-Type': 'application/octet-stream',
-                               'Connection': 'close'},
+                               'Content-Length': str(len(art_bytes))},
                       timeout=POST_TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
@@ -176,16 +195,18 @@ def send_album_cover(art_bytes: bytes) -> bool:
     logger.info('Successfully sent image to MCU')
     return True
 
-def send_screensaver_intent() -> bool:
+def send_screensaver_intent(url: str) -> bool:
     """
     Sends an intent to the ESP MCU /screensaver endpoint. Fails gracefully if unsuccessful.
+
+    Parameters:
+        url (str): The url of the MCU /screensaver endpoint.
 
     Returns:
         bool: Whether or not the POST request was sent (and received) successfully.
     """
     try:
-        resp = requests.post(SCREENSAVER_ENDPOINT,
-                      headers={'Connection': 'close'},
+        resp = esp_session.post(url,
                       timeout=POST_TIMEOUT)
         resp.raise_for_status()
     except requests.RequestException as e:
@@ -213,9 +234,13 @@ def main():
         logger.critical(f'Startup failed: {e}')
         sys.exit(1)
 
+    mcu_ip = resolve_mdns(MDNS_HOSTNAME)
+    image_endpoint = f'http://{mcu_ip}/image'
+    screensaver_endpoint = f'http://{mcu_ip}/screensaver'
+
     current_album_id = None
     screensaver_active = False
-    if send_screensaver_intent():
+    if send_screensaver_intent(screensaver_endpoint):
         screensaver_active = True
 
     while True:
@@ -226,7 +251,7 @@ def main():
             if not track_response or not track_response.get('item'):
                 current_album_id = None
                 if not screensaver_active:
-                    if send_screensaver_intent():
+                    if send_screensaver_intent(screensaver_endpoint):
                         screensaver_active = True
                 snooze(iter_start)
                 continue
@@ -246,7 +271,7 @@ def main():
 
             cover_url = get_image_url(album)
             art_bytes = generate_byte_arr(cover_url)
-            if send_album_cover(art_bytes):
+            if send_album_cover(image_endpoint, art_bytes):
                 current_album_id = album_id  # Only update after matrix updated
                 screensaver_active = False
             snooze(iter_start)
