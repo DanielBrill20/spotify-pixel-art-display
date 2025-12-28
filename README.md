@@ -2,7 +2,7 @@
 
 <img src="assets\flower_boy_cover.jpg" alt="Flower Boy album cover on LED matrix" height="250">
 <img src="assets\game_of_life.jpg" alt="Conway's Game of Life on LED Matrix" height="250">
-<img src="assets\not_all_heroes_wear_capes.jpg" alt="NOT ALL HEROES WEAR CAPES album cover on LED matrix" height="250">
+<img src="assets\not_all_heroes_wear_capes_cover.jpg" alt="NOT ALL HEROES WEAR CAPES album cover on LED matrix" height="250">
 
 Bring music data into the physical world with a Wi-Fi connected LED matrix that turns Spotify album art into animated pixel art. This project spans embedded systems, networked services, and creative tooling, purpose-built to showcase end-to-end experience design for creative technologist roles.
 
@@ -27,6 +27,29 @@ Bring music data into the physical world with a Wi-Fi connected LED matrix that 
 <a href="https://vimeo.com/1147558569">
    <img src="assets\gol_demo_thumbnail.png" alt="Click to view Game of Life demo video" width="300">
 </a>
+
+## Temp Holder
+<img src="assets\panel_back.jpg" alt="Back of LED panel" height="350">
+<img src="assets\panel_power_wires.png" alt="Wires to power panel and ESP" height="350">
+<img src="assets\esp32_pinout.png" alt="ESP32 pinout" height="350">
+<img src="assets\hardware_construction.jpg" alt="Panel with all wires connected" height="350">
+
+| Signal | ESP32-S3 Pin |
+|--------|--------------|
+| R1     | 4            |
+| G1     | 5            |
+| B1     | 6            |
+| R2     | 17           |
+| G2     | 18           |
+| B2     | 8            |
+| A      | 10           |
+| B      | 11           |
+| C      | 12           |
+| D      | 13           |
+| E      | 9            |
+| LAT    | 47           |
+| OE     | 21           |
+| CLK    | 16           |
 
 ## System Overview
 1. The ESP32 firmware (ESP-IDF plus Arduino component) boots, connects to Wi-Fi, hosts a lightweight HTTP server, and drives the HUB75 LED matrix through DMA.
