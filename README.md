@@ -141,7 +141,7 @@ This screensaver is simply [Conway's Game of Life](https://en.wikipedia.org/wiki
    ```bash
    pip install -r requirements.txt
    ```
-4. Create a Spotify application and capture the client credentials and redirect URI.
+4. Create a Spotify application in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) and capture the client credentials and redirect URI.
 5. Create a new file named .env and add the required variables:
    ```dotenv
    CLIENT_ID=your_spotify_client_id
