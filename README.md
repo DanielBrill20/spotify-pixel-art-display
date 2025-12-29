@@ -114,14 +114,14 @@ This screensaver is simply [Conway's Game of Life](https://en.wikipedia.org/wiki
    # or
    .\apply_patches.ps1            # Windows PowerShell
    ```
-5. The Arduino component will cause a build error. The FreeRTOS tick rate needs to change from 100Hz to 1000Hz. While this can be done in menuconfig, it will cause a build error before `idf.py menuconfig` can even open.
-      - Open `sdkconfig` and manually change `CONFIG_FREERTOS_HZ=100` to `CONFIG_FREERTOS_HZ=1000`.
-         - If `sdkconfig` does not yet exist, you need to prompt one to be generated. Try running `idf.py menuconfig`, `idf.py build`, or `idf.py set-target esp32s3`. Some of these commands may fail because of the tick rate issue, but they will prompt `sdkconfig` creation.
-      - For reference, this setting can be found in menuconfig through menus `Component config` -> `FreeRTOS` -> `Kernel` -> `configTICK_RATE_HZ` (Although, if you can access this in menuconfig, it should already be correct!)
-6. Select the correct silicon target for your board:
+5. Select the correct silicon target for your board:
    ```bash
    idf.py set-target esp32s3      # choose esp32, esp32s3, esp32s2, etc.
    ```
+6. The Arduino component will cause a build error. The FreeRTOS tick rate needs to change from 100Hz to 1000Hz. While this can be done in menuconfig, it will cause a build error before `idf.py menuconfig` can even open.
+      - Open `sdkconfig` and manually change `CONFIG_FREERTOS_HZ=100` to `CONFIG_FREERTOS_HZ=1000`.
+         - If `sdkconfig` does not yet exist (but it should if step 5 was successful), you need to prompt one to be generated. Try running `idf.py menuconfig` or `idf.py build`. These commands will fail because of the tick rate issue, but they will prompt `sdkconfig` creation.
+      - For reference, this setting can be found in menuconfig through menus `Component config` -> `FreeRTOS` -> `Kernel` -> `configTICK_RATE_HZ` (Although, if you can access this in menuconfig, it should already be correct!)
 7. Configure Wi-Fi credentials, mDNS hostname, panel dimensions, and HUB75 pins:
    ```bash
    idf.py menuconfig              # Navigate to Spotify Pixel Art Display Configuration
