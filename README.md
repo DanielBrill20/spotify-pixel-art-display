@@ -1,8 +1,6 @@
 # Spotify Pixel Art Display
 
-<img src="assets/flower_boy_cover.jpg" alt="Flower Boy album cover on LED matrix" height="250">
-<img src="assets/game_of_life.jpg" alt="Conway's Game of Life on LED Matrix" height="250">
-<img src="assets/not_all_heroes_wear_capes_cover.jpg" alt="NOT ALL HEROES WEAR CAPES album cover on LED matrix" height="250">
+<img src="assets/flower_boy_cover.jpg" alt="Flower Boy album cover on LED matrix" height="250"> <img src="assets/game_of_life.jpg" alt="Conway's Game of Life on LED Matrix" height="250"> <img src="assets/not_all_heroes_wear_capes_cover.jpg" alt="NOT ALL HEROES WEAR CAPES album cover on LED matrix" height="250">
 
 Bring your listening habits to your room décor with this HUB75 LED matrix display. This Wi-Fi connected art piece converts album art into pixel art, dynamically displaying whatever you're listening to on Spotify. When Spotify isn't playing, the matrix shifts to a fading rainbow gradient screensaver based on Conway's Game of Life.
 
