@@ -21,8 +21,8 @@ Bring your listening habits to your room décor with this HUB75 LED matrix displ
 - [Firmware Setup](#firmware-setup)
 - [Backend Server Setup](#backend-server-setup)
 - [Hardware](#hardware)
-   - [Hardware Images](#hardware-images)
    - [Pinout](#pinout)
+   - [Hardware Images](#hardware-images)
 - [Portfolio Spotlight](#portfolio-spotlight)
    - [Image Data is Stored in Static Buffers](#image-data-is-stored-in-static-buffers)
    - [Backend Image Fetching is Efficient and Handles Malformed Data](#backend-image-fetching-is-efficient-and-handles-malformed-data)
@@ -168,13 +168,9 @@ This screensaver is simply [Conway’s Game of Life](https://en.wikipedia.org/wi
 8.	**Optional: A small fuse (0.75 – 1 A) and fuse holder**
       - For a clean assembly, I power the matrix and ESP with the same PSU. An ESP should never draw more current than it needs. However, due to the high amperage of the PSU, I figured it couldn’t hurt to add a safeguard between the PSU and ESP.
 
-### Hardware Images
-<img src="assets/panel_back.jpg" alt="Back of LED panel" height="350">
-<img src="assets/panel_power_wires.png" alt="Wires to power panel and ESP" height="350">
-<img src="assets/esp32_pinout.png" alt="ESP32 pinout" height="350">
-<img src="assets/hardware_construction.jpg" alt="Panel with all wires connected" height="350">
-
 ### Pinout
+This is the default pinout as provided in the `Spotify Pixel Art Display Configuration` menu in `idf.py menuconfig`, meaning this can also be customized to fit your needs.
+
 | Signal | ESP32-S3 Pin |
 |--------|--------------|
 | R1     | 4            |
@@ -191,6 +187,12 @@ This screensaver is simply [Conway’s Game of Life](https://en.wikipedia.org/wi
 | LAT    | 47           |
 | OE     | 21           |
 | CLK    | 16           |
+
+### Hardware Images
+<img src="assets/panel_back.jpg" alt="Back of LED panel" height="350">
+<img src="assets/panel_power_wires.png" alt="Wires to power panel and ESP" height="350">
+<img src="assets/esp32_pinout.png" alt="ESP32 pinout" height="350">
+<img src="assets/hardware_construction.jpg" alt="Panel with all wires connected" height="350">
 
 ## Portfolio Spotlight
 Since this is a portfolio project, here’s a bit more in-depth about some unique features and challenges I conquered along the way.
