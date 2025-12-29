@@ -27,10 +27,10 @@ Bring your listening habits to your room décor with this HUB75 LED matrix displ
 The core of the project is a backend Python server that repeatedly calls the Spotify Web API to get the currently playing track or podcast episode for the user. The flow is as follows:
 
 1.	The user authenticates Spotify, following the [Authorization Code Flow]( https://developer.spotify.com/documentation/web-api/tutorials/code-flow).
-2.	Once authenticated, a browser window will pop up. The user pastes this link to the terminal.
+2.	Once authenticated, a browser window will pop up. The user pastes this link into the terminal.
 3.	Credentials get saved in a `.cache` file. From there, the server handles token renewal.
 4.	Every 0.5 seconds, poll the Spotify Wen API to fetch the user’s currently playing song or episode.
-5.	On song change, get the album cover.
+5.	On song change, get the album cover image.
 6.	If needed, resize the image. Resizing is based on:
       - The LED matrix panel resolution
       - The desired pixel art resolution
@@ -39,8 +39,8 @@ The core of the project is a backend Python server that repeatedly calls the Spo
 8.	If Spotify stops playing, send an intent to switch to “screensaver mode” to the ESP32.
 
 ## ESP-IDF HUB75 LED Matrix Firmware Overview
-For HUB75 LED matrix control, I use an ESP32-S3 (my dev board of choice is a ESP32-S3-DevKitC-1 N8R8, although you can use any module as long as the MCU has enough memory to handle large DMA buffers). This project utilizes a double DMA buffer for rapid and smooth drawing of images. While one image is being displayed with data in the front buffer, data can be loaded into the back buffer. Once the back buffer image is ready, the buffers are swapped for immediate frame transition. Otherwise, the user would see images being drawn line by line. The firmware is primarily coded in C using the ESP-IDF framework. The matrix drawing is done in C++ using the [ESP32-HUB75-MatrixPanel-DMA library]( https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA). The flow of the firmware is as follows:
-1.	Initialize the LED matrix driver. This includes setting up custom pinouts, matrix panel dimensions, clearing the screen, etc.
+For HUB75 LED matrix control, I use an ESP32-S3 (my dev board of choice is a ESP32-S3-DevKitC-1 N8R8, although you can use any module as long as the MCU has enough memory to handle large Direct Memory Access (DMA) buffers). This project utilizes a double DMA buffer for rapid and smooth drawing of images. While one image is being displayed with data in the front buffer, data can be loaded into the back buffer. Once the back buffer image is ready, the buffers are swapped for immediate frame transition. Otherwise, the user would see images being drawn line by line. The firmware is primarily coded in C using the ESP-IDF framework. The matrix drawing is done in C++ using the [ESP32-HUB75-MatrixPanel-DMA library]( https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA). The flow of the firmware is as follows:
+1.	Initialize the LED matrix driver. This includes setting up custom pinouts, matrix panel dimensions, clearing the display, etc.
 2.	Initialize the Wi-Fi manager. This includes authenticating the Wi-Fi access point connection, handling disconnects and retries, registering an mDNS hostname for easy backend server communication, etc.
 3.	Initialize the HTTP server that communicates with the backend server by registering the `/image` and `/screensaver` endpoints.
 
@@ -61,7 +61,7 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
 ### Backend Server
 -	Spotipy
 -	Pillow
--	Other common ones, see `requirements.txt`
+-	Other common ones, see `spotify_api_server/requirements.txt`
 
 ### ESP32 Firmware
 -	[ESP32-HUB75-MatrixPanel-DMA](https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA)
@@ -71,12 +71,12 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
 -	Other ESP components for Wi-Fi, mDNS, etc.
 
 `Adafruit-GFX` is a dependency of `ESP32-HUB75-MatrixPanel-DMA`, and `Adafruit_BusIO` is a dependency of `Adafruit-GFX`. It is recommended to install these as git submodules, as there are currently no native ESP components.
-`arduino-esp32` (a dependency of the DMA library), on the other hand, can be [installed as a component](https://components.espressif.com/components/espressif/arduino-esp32). Once this is done, several updates will need to be made to the various components `CMakeLists.txt` files. This can be done quickly with supplied git patches.
+`arduino-esp32` (a dependency of the DMA library), on the other hand, can be [installed as a component](https://components.espressif.com/components/espressif/arduino-esp32). Once this is done, several updates will need to be made to the various components' `CMakeLists.txt` files. This can be done quickly with supplied git patches.
 
 ## Firmware Setup
 1. Install ESP-IDF and add the tools to your PATH.
 2. Clone this repo (include submodules) and open a shell in esp_firmware/:
-   ```
+   ```bash
    git clone --recurse-submodules https://github.com/DanielBrill20/spotify-pixel-art-display.git
    # or
    git clone https://github.com/DanielBrill20/spotify-pixel-art-display.git
@@ -94,7 +94,7 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
    ```
 5. Configure Wi-Fi credentials, mDNS hostname, panel geometry, and HUB75 pins:
    ```bash
-   idf.py menuconfig              # Spotify Pixel Art Display Configuration
+   idf.py menuconfig              # Navigate to Spotify Pixel Art Display Configuration
    ```
 6. Build, flash, and monitor:
    ```bash
@@ -103,8 +103,8 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
    idf.py monitor                 # Press Ctrl+] to exit
    ```
 
-## Spotify API Server Setup (Python)
-1. Move into the backend folder.
+## Backend Server Setup
+1. Move into the backend folder, `spotify_api_server`.
 2. Create and activate a virtual environment:
    ```bash
    python -m venv .venv
@@ -127,7 +127,7 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
    ```bash
    python main.py
    ```
-7. A browser window will prompt for Spotify authorization the first time.
+7. A browser window will prompt for Spotify authorization the first time. Once authenticated, paste the resulting popup browser URL into the terminal.
 
 ## Hardware
 1.	**HUB75 LED matrix** (a square aspect ratio looks best considering album art is, well, square!)
@@ -136,10 +136,10 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
 3.	**5V 4A (minimum) PSU**
       - **Note:** LED panels draw quite a lot of current, and they struggle when powered by an inconsistent or overloaded PSU. Between the panel, ESP32, potentially other peripherals in the future, and wanting to operate at about 50% max amperage, I opted for a 5V 9A (45W) PSU. Specifically, I’m using the [PEAMD72-10-B2]( https://www.ttelectronics.com/TTElectronics/media/ProductFiles/Datasheet/PEAMD72.pdf) from TT Electronics.
 4.	**Cables** for data and power (often come with the matrix)
-      - **Note:** Not all wires are created equal! For any component undergoing current, it’s good to understand what’s the maximum current the component can safely withstand. Too many projects I see ignore this, using flimsy jumper wires to carry large amounts of current. The potential downsides? Damaged wires, melting plastic, fire? I’m no electrical engineer, but get thick enough wires! Here is a handy [Wiki and wire ampacity chart](https://en.wikipedia.org/wiki/American_wire_gauge).
+      - **Note:** Not all wires are created equal! For any component undergoing current, it’s good to understand what’s the maximum current the component can safely withstand. Too many projects ignore this, using flimsy jumper wires to carry large amounts of current. The potential downsides? Damaged wires, melting plastic, fire? I’m no electrical engineer, but get thick enough wires! Here's a handy [Wiki and wire ampacity chart](https://en.wikipedia.org/wiki/American_wire_gauge).
 5.	**Screw terminal DC barrel jack connector**
 6.	**Computer (and power supply, storage, etc.)** to host the backend server. I’m using my Raspberry Pi Zero 2 W, which is the hub for all my projects.
-7.	**Optional: A diffuser screen.** I use a piece of translucent black acrylic that I cut to size. This diffuses the LEDs and improves contrast
+7.	**Optional: A diffuser screen.** I use a piece of translucent black acrylic that I cut to size. This diffuses the LEDs and improves contrast.
 8.	**Optional: A small fuse (0.75 – 1 A) and fuse holder**
       - For a clean assembly, I power the matrix and ESP with the same PSU. An ESP should never draw more current than it needs. However, due to the high amperage of the PSU, I figured it couldn’t hurt to add a safeguard between the PSU and ESP.
 
@@ -173,8 +173,8 @@ Since this is a portfolio project, here’s a bit more in-depth about some uniqu
 ### Image Data is Stored in Static Buffers
 Image bytes from the backend HTTP request are read into an uninitialized static buffer in the firmware code. As an uninitialized static variable, this buffer lives in the .bss (Block Started by Symbol) segment of memory. This was a conscious choice influenced by a few factors:
 1.	Displayable image data must always be `PANEL_WIDTH * PANEL_HEIGHT * 3` bytes, the 3 representing the three channels in RGB color. The display logic expects bytes for each LED (even if that means `(0, 0, 0)`), so anything less could cause distorted images. This constant size is perfect for a static buffer.
-2.	If we were to read the HTTP POST content into a local variable, it would live in the stack. For a 64 x 64 panel, this is `12288` bytes, or a bit over 12 KB. By default in ESP-IDF, the main task stack size is usually around 4 KB. This would cause stack overflow unless you increased the stack size, which there’s no reason to do.
-3.	The other option would be to dynamically allocate and free the image bytes memory. Repeated large dynamic allocations risk heap fragmentation, especially with a project meant to run continuously.
+2.	If we were to read the HTTP POST content into a local variable, it would live in the stack. For a 64x64 panel, this is `12288` bytes, or a bit over 12 KB. By default in ESP-IDF, the main task stack size is usually around 4 KB. This would cause stack overflow unless you increased the stack size, which there’s no reason to do.
+3.	The other option would be to dynamically allocate and free memory for the image bytes. Repeated large dynamic allocations risk heap fragmentation, especially with a project meant to run continuously.
 
 ### Backend Image Fetching is Efficient and Handles Malformed Data
 For songs and podcasts episodes, the Spotify Web API typically includes the three album cover images of various sizes. The typical output looks something like:
@@ -197,20 +197,20 @@ For songs and podcasts episodes, the Spotify Web API typically includes the thre
   }
 ]
 ```
-As you can see, the last image is often 64 x 64. If you have a 64 x 64 LED panel, this is perfect! To minimize image processing slowdowns and unnecessary resizes, the server starts with the smallest image, checks its size (provided by the JSON response), and only resizes if needed based on the panel dimensions and desired pixel art resolution. In essence, it uses the smallest usable image. It will never attempt to scale a picture up to dimensions.
+As you can see, the last image is often 64x64. If you have a 64x64 LED panel, this is perfect! To minimize image processing slowdowns and unnecessary resizes, the server starts with the smallest image, checks its size (provided by the JSON response), and only resizes if needed based on the panel dimensions and desired pixel art resolution. In essence, it uses the smallest usable image. It will never attempt to scale an image up to dimensions.
 
-Furthermore, in testing, some album covers either crashed the firmware code or caused distorted images on the matrix. A couple of problematic albums I found were JAY-Z’s The Black Album and Gunna’s a Gift & a Curse. The problem? These albums, despite dimensions stated by the API response, are not actually square. For a “64 x 64” image, dimensions were typically a few pixels short in one dimension. The fix? To avoid stretching the album art, I opted for padding the edges with off pixels and centering the image.
+Furthermore, in testing, some album covers either caused crashes or distorted images on the matrix. A couple of problematic albums I found were JAY-Z’s "The Black Album" and Gunna’s "a Gift & a Curse." The problem? These albums, despite dimensions stated by the API response, are not actually square. For a problematic “64x64” image, dimensions were typically a few pixels short in one axis. The fix? The server does a sanity check on the actual image dimensions before sending data. If problems arise, it centers the image and pads edges with black pixels, avoiding stetched album art.
 
-To explain the observed issues, the firmware would crash because it was attempting to read more bytes from the HTTP request than where sent. In the few cases of distorted, almost “twisted” looking images, images were too narrow. Image bytes are stored in a 1D array, not 2D. Images are drawn from left to right, top down. If an image is 60 pixels wide, but being drawn to the 64 x 64 matrix, the image bytes are just read sequentially from the buffer. So, the last 4 pixels on the first row will be filled with data meant for the first 4 pixels on the second row. This will leave 8 would-be-empty pixels on the second row (4 from the narrow image, 4 from the bytes “moved” to the first row). These 8 pixels will be filled with the data from the first 8 pixels of the third row. As you can see, this effect compounds, and the image appears to twist.
+To explain the observed issues, the firmware would crash because it was attempting to read more bytes from the HTTP request than where sent. In the few cases of distorted, almost “twisted” looking images, images were too narrow (meaning short in the x direction specifically). Image bytes are stored in a 1D array, not 2D. Images are drawn from left to right, top to bottom by reading sequentially from the buffer. If an image is 60 pixels wide, but being drawn to the 64x64 matrix, the last 4 pixels on the first row will be filled with data meant for the first 4 pixels on the second row. This will leave 8 "would-be-empty pixels" on the second row (4 from the narrow image, 4 from the bytes “moved” to the first row). These 8 pixels will be filled with the data from the first 8 pixels of the third row. As you can see, this effect compounds, and the image appears to twist.
 
 ### Backend Server Uses a Single Requests Session for ESP32 Communication
-The server uses Python’s `requests` library for inter-device communication. By using only one persistent requests session, TCP/TLS handshakes and mDNS lookups happen once at the start of the connection between devices. Each subsequent POST request can avoid these time-intensive operations, significantly reducing data transfer time and improving matrix responsiveness by roughly 10x.
+The server uses Python’s `requests` library for inter-device communication. By using only one persistent requests session, TCP/TLS handshakes and mDNS lookup happen once at the start of the connection between devices. Each subsequent POST request can avoid these time-intensive operations, significantly reducing data transfer time and improving matrix responsiveness by roughly 10x.
 
 ### Firmware Defaults to a Negative Clock Phase
-In initial matrix testing, my display had significant ghosting and was occasionally shifted by 1 pixel. My specific hardware has a negative clock edge, which is easily addressed by the DMA library. In fact, [here’s their much better documentation on the issue]( https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA?tab=readme-ov-file#:~:text=Clock%20Phase,is%20commented%20out).
+In initial matrix testing, my display had significant ghosting and was occasionally shifted by 1 pixel. My specific hardware has a negative clock edge, which is easily addressed by the DMA library. In fact, here’s their much better [documentation on the issue]( https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA?tab=readme-ov-file#:~:text=Clock%20Phase,is%20commented%20out).
 
 ### Wi-Fi Initialization is Blocking
-This is true for any ESP-IDF project. However, by default, the various steps required in Wi-Fi AP configuration happen asynchronously. Since I immediately set up an HTTP server after, which relies on a connected Wi-Fi network, server setup can silently fail if Wi-Fi initialization is not complete. For this reason, this project uses [FreeRTOS `xEventGroupWaitBits`](https://freertos.org/Documentation/02-Kernel/04-API-references/12-Event-groups-or-flags/04-xEventGroupWaitBits) to make Wi-Fi initialization blocking.
+By default, the various steps required in Wi-Fi AP configuration happen asynchronously. Since I immediately set up an HTTP server after, which relies on a connected Wi-Fi network, server setup can silently fail if Wi-Fi initialization is not complete. For this reason, this project uses [FreeRTOS `xEventGroupWaitBits`](https://freertos.org/Documentation/02-Kernel/04-API-references/12-Event-groups-or-flags/04-xEventGroupWaitBits) to make Wi-Fi initialization blocking.
 
 ## Future Improvements
 1.	Migrate from an HTTP server to WebSocket for communication between the backend server and ESP32 server. Response time is already near-immediate, but WebSocket will improve error handling and detecting when one device is offline. For example, there is no need to poll the Spotify Web API if the ESP and matrix are powered off.
