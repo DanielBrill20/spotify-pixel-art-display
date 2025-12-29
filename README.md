@@ -96,30 +96,34 @@ This screensaver is simply [Conway's Game of Life](https://en.wikipedia.org/wiki
 `Adafruit-GFX` is a dependency of `ESP32-HUB75-MatrixPanel-DMA`, and `Adafruit_BusIO` is a dependency of `Adafruit-GFX`. It is recommended to install these as git submodules, as there are currently no native ESP components.
 `arduino-esp32` (a dependency of the DMA library), on the other hand, can be [installed as a component](https://components.espressif.com/components/espressif/arduino-esp32). Once this is done, several updates will need to be made to the various components' `CMakeLists.txt` files. This can be done quickly with supplied git patches.
 
+**Note:** You do not need to manually install git submodules or ESP components. Submodules will be added if you clone with `git clone --recurse-submodules https://github.com/DanielBrill20/spotify-pixel-art-display.git`. Components will be automatically installed based on `esp_firmware/dependencies.lock` when you attempt to build the project or enter `idf.py menuconfig`. All you need to do is apply the patches as explained in the next section.
+
 ## Firmware Setup
-1. Install ESP-IDF and add the tools to your PATH.
-2. Clone this repo (include submodules) and open a shell in esp_firmware/:
+1. Install ESP-IDF
+2. Clone this repo (including submodules):
    ```bash
    git clone --recurse-submodules https://github.com/DanielBrill20/spotify-pixel-art-display.git
    # or
    git clone https://github.com/DanielBrill20/spotify-pixel-art-display.git
    git submodule update --init --recursive
    ```
-3. Apply component patches so the bundled libraries build correctly:
+3. Open a terminal in esp_firmware/. It is best to open an `ESP-IDF Terminal` so you can run `idf.py` commands.
+4. Apply component patches so the bundled libraries build correctly:
    ```bash
    ./apply_patches.sh             # macOS / Linux
    # or
    .\apply_patches.ps1            # Windows PowerShell
    ```
-4. Select the correct silicon target for your board:
+5. The Arduino component will cause a build error. The FreeRTOS tick rate needs to change from 100Hz to 1000Hz. While this can be done in menuconfig, it will cause a build error before `idf.py menuconfig` can even open. Open `sdkconfig` and manually change `CONFIG_FREERTOS_HZ=100` to `CONFIG_FREERTOS_HZ=1000`. For future reference, this setting can be found in menuconfig through menus `Component config` -> `FreeRTOS` -> `Kernel` -> `configTICK_RATE_HZ`
+6. Select the correct silicon target for your board:
    ```bash
    idf.py set-target esp32s3      # choose esp32, esp32s3, esp32s2, etc.
    ```
-5. Configure Wi-Fi credentials, mDNS hostname, panel geometry, and HUB75 pins:
+7. Configure Wi-Fi credentials, mDNS hostname, panel dimensions, and HUB75 pins:
    ```bash
    idf.py menuconfig              # Navigate to Spotify Pixel Art Display Configuration
    ```
-6. Build, flash, and monitor:
+8. Build, flash, and monitor:
    ```bash
    idf.py build
    idf.py flash
