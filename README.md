@@ -6,6 +6,31 @@
 
 Bring your listening habits to your room décor with this HUB75 LED matrix display. This Wi-Fi connected art piece converts album art into pixel art, dynamically displaying whatever you’re listening to on Spotify. When Spotify isn’t playing, the matrix shifts to a fading rainbow gradient screensaver based on Conway’s Game of Life.
 
+## Table of Contents
+- [Feature Snapshot](#feature-snapshot)
+- [Spotify Demo](#spotify-demo-click-to-view-on-vimeo)
+- [Game of Life Demo](#game-of-life-demo-click-to-view-on-vimeo)
+- [Backend Spotify API Server Overview](#backend-spotify-api-server-overview)
+- [ESP-IDF HUB75 LED Matrix Firmware Overview](#esp-idf-hub75-led-matrix-firmware-overview)
+   - [`/image` Endpoint](#image-endpoint)
+   - [`/screensaver` Endpoint](#screensaver-endpoint)
+   - [Conway’s Game of Life Screensaver](#conways-game-of-life-screensaver)
+- [Dependencies](#dependencies)
+   - [Backend Server](#backend-server)
+   - [ESP32 Firmware](#esp32-firmware)
+- [Firmware Setup](#firmware-setup)
+- [Backend Server Setup](#backend-server-setup)
+- [Hardware](#hardware)
+   - [Hardware Images](#hardware-images)
+   - [Pinout](#pinout)
+- [Portfolio Spotlight](#portfolio-spotlight)
+   - [Image Data is Stored in Static Buffers](#image-data-is-stored-in-static-buffers)
+   - [Backend Image Fetching is Efficient and Handles Malformed Data](#backend-image-fetching-is-efficient-and-handles-malformed-data)
+   - [Backend Server Uses a Single Requests Session for ESP32 Communication](#backend-server-uses-a-single-requests-session-for-esp32-communication)
+   - [Firmware Defaults to a Negative Clock Phase](#firmware-defaults-to-a-negative-clock-phase)
+   - [Wi-Fi Initialization is Blocking](#wi-fi-initialization-is-blocking)
+- [Future Improvements](#future-improvements)
+
 ## Feature Snapshot
 - **Live album art rendering** - Streaming Spotify cover art is resized to a 64x64 RGB matrix and displayed in under a second.
 - **Generative screensaver** - A custom Conway's Game of Life animation fills downtime when nothing is playing.
