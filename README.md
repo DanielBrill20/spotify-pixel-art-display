@@ -187,10 +187,8 @@ This is the default pinout as provided in the `Spotify Pixel Art Display Configu
 | CLK    | 16           |
 
 ### Hardware Images
-<img src="assets/panel_back.jpg" alt="Back of LED panel" height="350">
-<img src="assets/panel_power_wires.png" alt="Wires to power panel and ESP" height="350">
-<img src="assets/esp32_pinout.png" alt="ESP32 pinout" height="350">
-<img src="assets/hardware_construction.jpg" alt="Panel with all wires connected" height="350">
+<img src="assets/panel_back.jpg" alt="Back of LED panel" width="350"> <img src="assets/esp32_pinout.png" alt="ESP32 pinout" width="350">
+<img src="assets/panel_power_wires.png" alt="Wires to power panel and ESP" width="280"> <img src="assets/hardware_construction.jpg" alt="Panel with all wires connected" width="420">
 
 ## Portfolio Spotlight
 Since this is a portfolio project, here's a bit more in-depth about some unique features and challenges I conquered along the way.
