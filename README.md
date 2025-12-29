@@ -1,8 +1,8 @@
 # Spotify Pixel Art Display
 
-<img src="assets\flower_boy_cover.jpg" alt="Flower Boy album cover on LED matrix" height="250">
-<img src="assets\game_of_life.jpg" alt="Conway's Game of Life on LED Matrix" height="250">
-<img src="assets\not_all_heroes_wear_capes_cover.jpg" alt="NOT ALL HEROES WEAR CAPES album cover on LED matrix" height="250">
+<img src="assets/flower_boy_cover.jpg" alt="Flower Boy album cover on LED matrix" height="250">
+<img src="assets/game_of_life.jpg" alt="Conway's Game of Life on LED Matrix" height="250">
+<img src="assets/not_all_heroes_wear_capes_cover.jpg" alt="NOT ALL HEROES WEAR CAPES album cover on LED matrix" height="250">
 
 Bring your listening habits to your room décor with this HUB75 LED matrix display. This Wi-Fi connected art piece converts album art into pixel art, dynamically displaying whatever you’re listening to on Spotify. When Spotify isn’t playing, the matrix shifts to a fading rainbow gradient screensaver based on Conway’s Game of Life.
 
@@ -40,18 +40,18 @@ Bring your listening habits to your room décor with this HUB75 LED matrix displ
 
 ## Spotify Demo (Click to view on Vimeo)
 <a href="https://vimeo.com/1147558667">
-   <img src="assets\spotify_demo_thumbnail.png" alt="Click to view Spotify demo video" width="300">
+   <img src="assets/spotify_demo_thumbnail.png" alt="Click to view Spotify demo video" width="300">
 </a>
 
 ## Game of Life Demo (Click to view on Vimeo)
 <a href="https://vimeo.com/1147558569">
-   <img src="assets\gol_demo_thumbnail.png" alt="Click to view Game of Life demo video" width="300">
+   <img src="assets/gol_demo_thumbnail.png" alt="Click to view Game of Life demo video" width="300">
 </a>
 
 ## Backend Spotify API Server Overview
 The core of the project is a backend Python server that repeatedly calls the Spotify Web API to get the currently playing track or podcast episode for the user. The flow is as follows:
 
-1.	The user authenticates Spotify, following the [Authorization Code Flow]( https://developer.spotify.com/documentation/web-api/tutorials/code-flow).
+1.	The user authenticates Spotify, following the [Authorization Code Flow](https://developer.spotify.com/documentation/web-api/tutorials/code-flow).
 2.	Once authenticated, a browser window will pop up. The user pastes this link into the terminal.
 3.	Credentials get saved in a `.cache` file. From there, the server handles token renewal.
 4.	Every 0.5 seconds, poll the Spotify Wen API to fetch the user’s currently playing song or episode.
@@ -64,7 +64,7 @@ The core of the project is a backend Python server that repeatedly calls the Spo
 8.	If Spotify stops playing, send an intent to switch to “screensaver mode” to the ESP32.
 
 ## ESP-IDF HUB75 LED Matrix Firmware Overview
-For HUB75 LED matrix control, I use an ESP32-S3 (my dev board of choice is a ESP32-S3-DevKitC-1 N8R8, although you can use any module as long as the MCU has enough memory to handle large Direct Memory Access (DMA) buffers). This project utilizes a double DMA buffer for rapid and smooth drawing of images. While one image is being displayed with data in the front buffer, data can be loaded into the back buffer. Once the back buffer image is ready, the buffers are swapped for immediate frame transition. Otherwise, the user would see images being drawn line by line. The firmware is primarily coded in C using the ESP-IDF framework. The matrix drawing is done in C++ using the [ESP32-HUB75-MatrixPanel-DMA library]( https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA). The flow of the firmware is as follows:
+For HUB75 LED matrix control, I use an ESP32-S3 (my dev board of choice is a ESP32-S3-DevKitC-1 N8R8, although you can use any module as long as the MCU has enough memory to handle large Direct Memory Access (DMA) buffers). This project utilizes a double DMA buffer for rapid and smooth drawing of images. While one image is being displayed with data in the front buffer, data can be loaded into the back buffer. Once the back buffer image is ready, the buffers are swapped for immediate frame transition. Otherwise, the user would see images being drawn line by line. The firmware is primarily coded in C using the ESP-IDF framework. The matrix drawing is done in C++ using the [ESP32-HUB75-MatrixPanel-DMA library](https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA). The flow of the firmware is as follows:
 1.	Initialize the LED matrix driver. This includes setting up custom pinouts, matrix panel dimensions, clearing the display, etc.
 2.	Initialize the Wi-Fi manager. This includes authenticating the Wi-Fi access point connection, handling disconnects and retries, registering an mDNS hostname for easy backend server communication, etc.
 3.	Initialize the HTTP server that communicates with the backend server by registering the `/image` and `/screensaver` endpoints.
@@ -80,7 +80,7 @@ This is a POST endpoint to receive image bytes from the backend server. The serv
 This is a POST endpoint that accepts no data, but rather simply tells the `matrix_driver` module to enter screensaver mode. Currently, that means displaying the Conway’s Game of Life screensaver.
 
 ### Conway’s Game of Life Screensaver
-This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) with an added relaxing rainbow gradient effect. Each tick, or generation, lasts for 300 milliseconds before generating the next one. The starting seed is randomly generated using the `esp_random` function, which generates true random numbers by sampling noise from the active Wi-Fi module ([documentation]( https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/random.html)). The canvas is also continuous, meaning that it loops in the x and y directions, so X<sub>min</sub> == X<sub>max</sub> + 1.
+This screensaver is simply [Conway’s Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) with an added relaxing rainbow gradient effect. Each tick, or generation, lasts for 300 milliseconds before generating the next one. The starting seed is randomly generated using the `esp_random` function, which generates true random numbers by sampling noise from the active Wi-Fi module ([documentation](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/random.html)). The canvas is also continuous, meaning that it loops in the x and y directions, so X<sub>min</sub> == X<sub>max</sub> + 1.
 
 ## Dependencies
 ### Backend Server
@@ -159,7 +159,7 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
       - I found mine on Amazon. Here’s the [spec sheet](https://www.waveshare.com/wiki/RGB-Matrix-P2.5-64x64).
 2. **ESP32-S3 dev board** with sufficient RAM
 3.	**5V 4A (minimum) PSU**
-      - **Note:** LED panels draw quite a lot of current, and they struggle when powered by an inconsistent or overloaded PSU. Between the panel, ESP32, potentially other peripherals in the future, and wanting to operate at about 50% max amperage, I opted for a 5V 9A (45W) PSU. Specifically, I’m using the [PEAMD72-10-B2]( https://www.ttelectronics.com/TTElectronics/media/ProductFiles/Datasheet/PEAMD72.pdf) from TT Electronics.
+      - **Note:** LED panels draw quite a lot of current, and they struggle when powered by an inconsistent or overloaded PSU. Between the panel, ESP32, potentially other peripherals in the future, and wanting to operate at about 50% max amperage, I opted for a 5V 9A (45W) PSU. Specifically, I’m using the [PEAMD72-10-B2](https://www.ttelectronics.com/TTElectronics/media/ProductFiles/Datasheet/PEAMD72.pdf) from TT Electronics.
 4.	**Cables** for data and power (often come with the matrix)
       - **Note:** Not all wires are created equal! For any component undergoing current, it’s good to understand what’s the maximum current the component can safely withstand. Too many projects ignore this, using flimsy jumper wires to carry large amounts of current. The potential downsides? Damaged wires, melting plastic, fire? I’m no electrical engineer, but get thick enough wires! Here's a handy [Wiki and wire ampacity chart](https://en.wikipedia.org/wiki/American_wire_gauge).
 5.	**Screw terminal DC barrel jack connector**
@@ -169,10 +169,10 @@ This screensaver is simply [Conway’s Game of Life]( https://en.wikipedia.org/w
       - For a clean assembly, I power the matrix and ESP with the same PSU. An ESP should never draw more current than it needs. However, due to the high amperage of the PSU, I figured it couldn’t hurt to add a safeguard between the PSU and ESP.
 
 ### Hardware Images
-<img src="assets\panel_back.jpg" alt="Back of LED panel" height="350">
-<img src="assets\panel_power_wires.png" alt="Wires to power panel and ESP" height="350">
-<img src="assets\esp32_pinout.png" alt="ESP32 pinout" height="350">
-<img src="assets\hardware_construction.jpg" alt="Panel with all wires connected" height="350">
+<img src="assets/panel_back.jpg" alt="Back of LED panel" height="350">
+<img src="assets/panel_power_wires.png" alt="Wires to power panel and ESP" height="350">
+<img src="assets/esp32_pinout.png" alt="ESP32 pinout" height="350">
+<img src="assets/hardware_construction.jpg" alt="Panel with all wires connected" height="350">
 
 ### Pinout
 | Signal | ESP32-S3 Pin |
@@ -232,7 +232,7 @@ To explain the observed issues, the firmware would crash because it was attempti
 The server uses Python’s `requests` library for inter-device communication. By using only one persistent requests session, TCP/TLS handshakes and mDNS lookup happen once at the start of the connection between devices. Each subsequent POST request can avoid these time-intensive operations, significantly reducing data transfer time and improving matrix responsiveness by roughly 10x.
 
 ### Firmware Defaults to a Negative Clock Phase
-In initial matrix testing, my display had significant ghosting and was occasionally shifted by 1 pixel. My specific hardware has a negative clock edge, which is easily addressed by the DMA library. In fact, here’s their much better [documentation on the issue]( https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA?tab=readme-ov-file#:~:text=Clock%20Phase,is%20commented%20out).
+In initial matrix testing, my display had significant ghosting and was occasionally shifted by 1 pixel. My specific hardware has a negative clock edge, which is easily addressed by the DMA library. In fact, here’s their much better [documentation on the issue](https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA?tab=readme-ov-file#:~:text=Clock%20Phase,is%20commented%20out).
 
 ### Wi-Fi Initialization is Blocking
 By default, the various steps required in Wi-Fi AP configuration happen asynchronously. Since I immediately set up an HTTP server after, which relies on a connected Wi-Fi network, server setup can silently fail if Wi-Fi initialization is not complete. For this reason, this project uses [FreeRTOS `xEventGroupWaitBits`](https://freertos.org/Documentation/02-Kernel/04-API-references/12-Event-groups-or-flags/04-xEventGroupWaitBits) to make Wi-Fi initialization blocking.
