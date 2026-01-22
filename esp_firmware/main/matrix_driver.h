@@ -20,7 +20,7 @@ extern "C" {
 esp_err_t display_image();
 
 /**
- * @brief   Clears the matrix. (temporary, will implement screensaver later)
+ * @brief   Displays the screensaver. (Currently means running the Conway's Game of Life Screensaver)
  * 
  * @returns `ESP_OK` if screensaver mode succeeds, otherwise `ESP_FAIL` if matrix is uninitialized.
  */
