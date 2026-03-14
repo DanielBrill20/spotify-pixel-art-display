@@ -8,3 +8,4 @@ spotify_api_server/.env
 spotify_api_server/.venv
 spotify_api_server/.vscode/
 ProjectRoadmap.md
+ChangesLog.md
