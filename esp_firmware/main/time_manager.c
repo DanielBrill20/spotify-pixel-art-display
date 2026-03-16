@@ -2,6 +2,8 @@
 #include <esp_log.h>
 #include <esp_netif_sntp.h>
 #include <freertos/task.h>
+#include <stdlib.h>
+#include <time.h>
 
 static const char* TIME_TAG = "time manager";
 

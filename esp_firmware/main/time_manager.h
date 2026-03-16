@@ -13,7 +13,7 @@ extern "C" {
  *          Configures the timezone to US Eastern Time (EST/EDT).
  * 
  * @returns `ESP_OK` if configuration is successful,
- *          `ESP_FAIL` if the SNTP sync is not sucessful within 10 seconds.
+ *          `ESP_FAIL` if the SNTP sync is not successful within 10 seconds.
  */
 esp_err_t time_manager_init();
 
