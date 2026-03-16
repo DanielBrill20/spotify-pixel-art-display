@@ -1,4 +1,7 @@
 #include "analog_clock.h"
+#include <esp_log.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <math.h>
 #include <sdkconfig.h>
 #include <time.h>
@@ -78,6 +81,10 @@ static void analog_clock_task(void* arg)
 
 esp_err_t run_analog_clock(MatrixPanel_I2S_DMA* matrix)
 {
+    if (analog_clock_task_handle != NULL) {
+        ESP_LOGW(CLOCK_TAG, "Analog clock task is already running.");
+        return ESP_FAIL;
+    }
     BaseType_t returned;
     returned = xTaskCreate(analog_clock_task,
                         "analog clock task",
@@ -87,6 +94,7 @@ esp_err_t run_analog_clock(MatrixPanel_I2S_DMA* matrix)
                         &analog_clock_task_handle);
     if (returned != pdPASS) {
         ESP_LOGE(CLOCK_TAG, "Failed to create clock task with error code %d.", returned);
+        analog_clock_task_handle = NULL;
         return ESP_FAIL;
     }
     return ESP_OK;
@@ -99,6 +107,7 @@ esp_err_t stop_analog_clock()
         return ESP_FAIL;
     }
     vTaskDelete(analog_clock_task_handle);
+    analog_clock_task_handle = NULL;
     return ESP_OK;
 }
 

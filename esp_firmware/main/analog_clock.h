@@ -15,7 +15,8 @@ extern "C" {
  * 
  * @param   matrix The HUB75 LED matrix to draw to.
  * 
- * @returns `ESP_OK` if the task started successfully, otherwise `ESP_FAIL`.
+ * @returns `ESP_OK` if the task started successfully,
+ *          `ESP_FAIL` if the task is already running or fails to start.
  */
 esp_err_t run_analog_clock(MatrixPanel_I2S_DMA* matrix);
 
@@ -29,7 +30,7 @@ esp_err_t run_analog_clock(MatrixPanel_I2S_DMA* matrix);
 esp_err_t stop_analog_clock();
 
 /**
- * @brief   Initializes 2 arrays used for effecient drawing of the analog clock screensaver.
+ * @brief   Initializes 2 arrays used for efficient drawing of the analog clock screensaver.
  *          Specifically, the arrays contain x and y coordinates for the hour-marker dots.
  *          This must be run once before `run_analog_clock` can be called.
  */
